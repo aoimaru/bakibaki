@@ -191,6 +191,11 @@ func (c *Client) GetGitObject(hash string) ([]byte, error) {
 	return Zbuffer, nil
 }
 
+func (c *Client) GetIndexPath() (string) {
+	indexPath := "/index"
+	return c.Root+indexPath
+}
+
 func Create3TObject(lineMeta string) string {
 	hash := strings.Replace(lineMeta, "tree ", "", -1)
 	hash = strings.ReplaceAll(hash, " ", "")
