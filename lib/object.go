@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"compress/zlib"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -40,6 +41,7 @@ type Blob struct {
 
 func (b *Blob) Format() {
 	fmt.Printf("Object-Type: Blob Size: %d\n", b.Size)
+	fmt.Println(string(b.Content))
 }
 
 type Column struct {
@@ -55,6 +57,9 @@ type Tree struct {
 
 func (t *Tree) Format() {
 	fmt.Printf("Object-Type: Tree  Size: %d\n", t.Size)
+	for _, column := range t.Columns {
+		fmt.Printf("%s %s %s\n", column.Type, column.Name, column.Hash)
+	}
 }
 
 type Parent struct {
@@ -78,6 +83,15 @@ type Commit struct {
 
 func (c *Commit) Format() {
 	fmt.Printf("Object-Type: Commit  Size: %d\n", c.Size)
+	fmt.Println("Type     :", "Commit")
+	fmt.Println("Size     :", c.Size)
+	fmt.Println("Tree     :", c.Tree)
+	for _, parent := range c.Parents {
+		fmt.Println("Parents  :", parent)
+	}
+	fmt.Println("Author   :", c.Author)
+	fmt.Println("Committer:", c.Committer)
+	fmt.Println("Message  :", c.Message)
 }
 
 type Client struct {
@@ -125,7 +139,7 @@ func Header3Content(buffer *[]byte) ([]byte, []byte, error) {
 	}
 	datas = append(datas, data)
 	if len(datas) < LENGTH_OF_DATA {
-		return nil, nil, errors.New("Header or Contents is empty")
+		return nil, nil, errors.New("fatal: Not a valid object name")
 	}
 	Header := datas[0]
 
@@ -145,7 +159,7 @@ func (c *Client) GetGitObject(hash string) ([]byte, error) {
 	ObjectPath := c.Root + hashPath
 	f, err := os.Open(ObjectPath)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("where??")
 	}
 	defer f.Close()
 
@@ -207,8 +221,8 @@ func Create3ACObject(lineMeta string) (Sign, error) {
 
 }
 
-func CreateCommitObject(Header string, Content string) (Commit, error) {
-	sizeStr := strings.Replace(Header, "commit ", "", -1)
+func CreateCommitObject(Header []byte, Content []byte) (Commit, error) {
+	sizeStr := strings.Replace(string(Header), "commit ", "", -1)
 	size, err := strconv.Atoi(sizeStr)
 	if err != nil {
 		return Commit{}, err
@@ -264,4 +278,82 @@ func CreateCommitObject(Header string, Content string) (Commit, error) {
 
 }
 
+func CreateBlobObject(Header []byte, Content []byte) (Blob, error) {
+	sizeStr := strings.Replace(string(Header), "blob ", "", -1)
+	size, err := strconv.Atoi(sizeStr)
+	if err != nil {
+		return Blob{}, err
+	}
+	blob := Blob{
+		Size:    size,
+		Content: Content,
+	}
+	return blob, nil
+}
 
+func CreateTreeObject(Header []byte, Content []byte) (Tree, error) {
+	sizeStr := strings.Replace(string(Header), "tree ", "", -1)
+	size, err := strconv.Atoi(sizeStr)
+	if err != nil {
+		return Tree{}, err
+	}
+	buffers := make([][]byte, 0)
+	buffer := make([]byte, 0)
+
+	for _, cnt := range Content {
+		if cnt == 0 {
+			buffers = append(buffers, buffer)
+			buffer = make([]byte, 0)
+		}
+		buffer = append(buffer, cnt)
+	}
+	buffers = append(buffers, buffer)
+
+	lines := make([][]byte, 0)
+
+	for _, buffer := range buffers {
+		if len(buffer) <= 0 {
+			continue
+		}
+		if len(buffer) >= 20 {
+			hash := hex.EncodeToString(buffer[1:21])
+			meta := buffer[21:]
+			lines = append(lines, []byte(hash))
+			lines = append(lines, meta)
+		} else {
+			meta := buffer[1:]
+			lines = append(lines, meta)
+		}
+	}
+
+	columns := make([]Column, 0)
+	for n, line := range lines {
+		if len(line) <= 0 {
+			continue
+		}
+		if n%2 == 0 {
+			if strings.HasPrefix(string(line), "40000") {
+				name := strings.Replace(string(line), "40000 ", "", -1)
+				column := Column{
+					Type: "tree",
+					Name: name,
+					Hash: string(lines[n+1]),
+				}
+				columns = append(columns, column)
+			} else {
+				name := strings.Replace(string(line), "100644 ", "", -1)
+				column := Column{
+					Type: "blob",
+					Name: name,
+					Hash: string(lines[n+1]),
+				}
+				columns = append(columns, column)
+			}
+		}
+	}
+	tree := Tree{
+		Size:    size,
+		Columns: columns,
+	}
+	return tree, nil
+}

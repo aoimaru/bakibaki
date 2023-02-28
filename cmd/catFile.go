@@ -34,8 +34,7 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			fmt.Println(err)
 		}
-		// fmt.Println(GitRootPath)
-		// fmt.Println("fatal: Not a valid object name", args[0])
+		
 		hash := args[0]
 		client := lib.Client{
 			Root: GitRootPath,
@@ -48,25 +47,26 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			fmt.Println(err)
 		}
-		// fmt.Println(string(Header))
-		// fmt.Println(string(Content))
 
 		if strings.HasPrefix(string(Header), "blob ") {
-			fmt.Println("blob")
-		} else if strings.HasPrefix(string(Header), "tree ") {
-			fmt.Println("tree")
-		} else if strings.HasPrefix(string(Header), "commit ") {
-			fmt.Println("commit")
-			commit, err := lib.CreateCommitObject(string(Header), string(Content))
+			blob, err := lib.CreateBlobObject(Header, Content)
 			if err != nil {
 				fmt.Println(err)
 			}
-			fmt.Println("Size     :", commit.Size)
-			fmt.Println("Tree     :", commit.Tree)
-			fmt.Println("Parents  :", commit.Parents)
-			fmt.Println("Author   :", commit.Author)
-			fmt.Println("Committer:", commit.Committer)
-			fmt.Println("Message  :", commit.Message)
+			blob.Format()
+		} else if strings.HasPrefix(string(Header), "tree ") {
+			tree, err := lib.CreateTreeObject(Header, Content)
+			if err != nil {
+				fmt.Println(err)
+			}
+			tree.Format()
+		} else if strings.HasPrefix(string(Header), "commit ") {
+			commit, err := lib.CreateCommitObject(Header, Content)
+			if err != nil {
+				fmt.Println(err)
+			
+			}
+			commit.Format()
 		}
  	},
 	Args: func(cmd *cobra.Command, args []string) error {
