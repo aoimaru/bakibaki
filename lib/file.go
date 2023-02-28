@@ -2,11 +2,15 @@
 package lib
 
 import (
-	// "fmt"
+	"fmt"
 	"bytes"
 	"os"
 	"strconv"
 	"compress/zlib"
+	"crypto/sha1"
+    "encoding/hex"
+	// "io"
+	// "reflect"
 )
 
 func Press(buffer []byte) []uint8 {
@@ -34,32 +38,63 @@ func File2Byte(file_path string, fType string) ([]byte, error) {
 		return nil, err
 	}
 	defer f.Close()
-	buffer := make([]byte, 0)
-	buf := make([]byte, 64)
-	for {
-		n, _ := (*f).Read(buf)
-		if n==0 {
-			break
-		}
-		buffer = append(buffer, buf...)
-	}
 	meta, err := GetFileMeta(f, fType)
 	if err != nil {
 		return nil, err
 	}
-	buffer = append(meta, buffer...)
+	buffer, err := os.ReadFile(file_path)
+	if err != nil {
+		return nil, err
+	}
 
-	Pressed := Press(buffer)
-	return Pressed, nil
+	meta = append(meta, 0)
+	buffer = append(meta, buffer...)
+	return buffer, nil
 }
 
 
-func CreateBlobFile(file_path string) ([]byte, error) {
+func (c *Client) CreateBlobFile(file_path string) ([]byte, error) {
 	buffer, err := File2Byte(file_path, "blob")
 	if err != nil {
 		return nil, err
 	}
-	return buffer, nil
+
+	Pressed := Press(buffer)
+
+	sha1 := sha1.New()
+	sha1.Write(buffer)
+	
+	hash := hex.EncodeToString(sha1.Sum(nil))
+
+	hashPath, err := hash2Path(hash)
+	if err != nil {
+		return nil, err
+	}
+	hashDir, err := hash2PathDir(hash)
+	if err != nil {
+		return nil, err
+	}
+	if _, err := os.Stat(c.Root+hashDir); err != nil {
+		if err := os.MkdirAll(c.Root+hashDir, 1755); err != nil {
+			return nil, err
+		}
+	}
+
+	w, err := os.Create(c.Root+hashPath)
+	if err != nil {
+		return nil, err
+	}
+	defer w.Close()
+
+	count, err := w.Write(Pressed)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(hash)
+	fmt.Printf("write %d bytes\n", count)
+	
+	return Pressed, nil
+
 
 }
 

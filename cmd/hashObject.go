@@ -9,6 +9,7 @@ import (
 	"errors"
 	"github.com/spf13/cobra"
 	"github.com/aoimaru/bakibaki/lib"
+	"os"
 )
 
 // hashObjectCmd represents the hashObject command
@@ -22,8 +23,17 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		current, _ := os.Getwd()
+		GitRootPath, err := lib.FindBakiBakiRoot(current)
+		if err != nil {
+			fmt.Println(err)
+		}
+		
+		client := lib.Client{
+			Root: GitRootPath,
+		}
 		path := args[0]
-		buffer, err := lib.CreateBlobFile(path)
+		buffer, err := client.CreateBlobFile(path)
 		if err != nil {
 			fmt.Println(err)
 		}

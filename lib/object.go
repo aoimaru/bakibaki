@@ -107,6 +107,16 @@ func hash2Path(hash string) (string, error) {
 	return hashPath, nil
 }
 
+
+func hash2PathDir(hash string) (string, error) {
+	if len(hash) <= LENGTH_OF_HASH {
+		return "", errors.New("Invalid Hash")
+	}
+	DirPath:= hash[:2]
+	hashPath := "/objects/" + DirPath
+	return hashPath, nil
+}
+
 func extract(zr io.Reader) (io.Reader, error) {
 	return zlib.NewReader(zr)
 }
@@ -157,8 +167,10 @@ func (c *Client) GetGitObject(hash string) ([]byte, error) {
 		return nil, err
 	}
 	ObjectPath := c.Root + hashPath
+	// fmt.Println("ObjectPath:", ObjectPath)
 	f, err := os.Open(ObjectPath)
 	if err != nil {
+		fmt.Println(err)
 		return nil, errors.New("where??")
 	}
 	defer f.Close()

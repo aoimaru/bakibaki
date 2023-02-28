@@ -30,7 +30,8 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		current, _ := os.Getwd()
-		GitRootPath, err := lib.FindGitRoot(current)
+		// GitRootPath, err := lib.FindGitRoot(current)
+		GitRootPath, err := lib.FindBakiBakiRoot(current)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -41,10 +42,12 @@ to quickly create a Cobra application.`,
 		}
 		GObuffer, err := client.GetGitObject(hash)
 		if err != nil {
+			fmt.Println("ERROR:1")
 			fmt.Println(err)
 		}
 		Header, Content, err := lib.Header3Content(&GObuffer)
 		if err != nil {
+			fmt.Println("ERROR:2")
 			fmt.Println(err)
 		}
 
