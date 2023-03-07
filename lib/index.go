@@ -161,3 +161,10 @@ func GetIndexObject(file_path string) (*Index, error) {
 	}
 	return index, nil
 }
+
+
+func UpdateIndex(index *Index, name string, hash string) {
+	for _, entry := range (*index).Entries {
+
+	}
+}
