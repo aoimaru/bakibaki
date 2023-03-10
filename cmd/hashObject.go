@@ -12,6 +12,10 @@ import (
 	"os"
 )
 
+const (
+	NUM_OF_HO_ARGS = 2
+)
+
 // hashObjectCmd represents the hashObject command
 var hashObjectCmd = &cobra.Command{
 	Use:   "hashObject",
@@ -41,7 +45,7 @@ to quickly create a Cobra application.`,
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
 		/** 引数のバリデーションを行うことができる */
-		if len(args) < NUM_OF_ARGS {
+		if len(args) < NUM_OF_HO_ARGS {
 			return errors.New("requires args")
 		}
 		return nil

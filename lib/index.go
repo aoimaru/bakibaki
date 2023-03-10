@@ -2,13 +2,13 @@ package lib
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strconv"
-	"time"
-	"errors"
-	"io/ioutil"
 	"strings"
+	"time"
 )
 
 type Entry struct {
@@ -25,6 +25,9 @@ type Entry struct {
 }
 
 type Index struct {
+	Dirc    string
+	Version uint64
+	Number  uint64
 	Entries []Entry
 }
 
@@ -83,6 +86,11 @@ func GetIndexFile(file_path string) ([]byte, error) {
 }
 
 func CreateIndex(buffer []byte) (*Index, error) {
+	dirc := string(buffer[0:4])
+	if dirc != "DIRC" {
+		return nil, errors.New("NOT INDEX FILE")
+	}
+
 	version := Bytes2uint(buffer[4:8])
 	if version != 2 {
 		err := errors.New("Invalid Version Error")
@@ -94,6 +102,10 @@ func CreateIndex(buffer []byte) (*Index, error) {
 	buffer = buffer[12:]
 
 	var index Index
+
+	index.Dirc = dirc
+	index.Version = version
+	index.Number = enum
 
 	var count uint64
 	count = 0
@@ -162,24 +174,27 @@ func GetIndexObject(file_path string) (*Index, error) {
 	return index, nil
 }
 
-
 func UpdateIndex(index *Index, name string, hash string) {
+	fmt.Println((*index).Dirc, (*index).Version, (*index).Number)
+	fmt.Println(name, hash)
 	for _, entry := range (*index).Entries {
 		fmt.Println(entry)
 	}
 }
 
-
-func WriteIndex(index *Index, file_path string) (error) {
+func WriteIndex(index *Index, file_path string) error {
 	f, err := os.Open(file_path)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	for _, entry := range (*index).Entries {
-		Bentry := []byte(entry)
-		fmt.Println(Bentry)
-	} 
 
+
+	// for _, entry := range (*index).Entries {
+	// 	Bentry := []byte(entry)
+	// 	fmt.Println(Bentry)
+	// }
+
+	return errors.New("None")
 }

@@ -8,11 +8,15 @@ import (
 	"fmt"
 	"os"
 	// "strings"
-
+	"errors"
 	"github.com/spf13/cobra"
 
 	"github.com/aoimaru/bakibaki/lib"
 )
+const (
+	NUM_OF_UI_ARGS = 2
+)
+
 
 // updateIndexCmd represents the updateIndex command
 var updateIndexCmd = &cobra.Command{
@@ -62,32 +66,14 @@ to quickly create a Cobra application.`,
 
 		
 		lib.UpdateIndex(index, "Hello", "World")
-		
-		/** update indexを試すためのプログラム */
-		// bakibakiRootPath, err := lib.FindBakiBakiRoot(current)
-		// if err != nil {
-		// 	fmt.Println(err)
-		// }
 
-		// bakibakiClient := lib.Client{
-		// 	Root: bakibakiRootPath,
-		// }
-
-		// bakibakiIndexPath := bakibakiClient.GetIndexPath()
-		// bakibakiIndex, err := lib.GetIndexObject(bakibakiIndexPath)
-		// if err != nil {
-		// 	fmt.Println(err)
-		// }
-
-		// fmt.Println(" ")
-		// fmt.Println(" ")
-		// fmt.Println(current)
-		// filePaths := lib.GetAllPath(current)
-		// for _, filePath := range filePaths {
-		// 	filePath = strings.Replace(filePath, current+"/", "", -1)
-		// 	fmt.Println(filePath)
-		// } 
-		
+	},
+	Args: func(cmd *cobra.Command, args []string) error {
+		/** 引数のバリデーションを行うことができる */
+		if len(args) < NUM_OF_UI_ARGS {
+			return errors.New("requires args")
+		}
+		return nil
 	},
 }
 

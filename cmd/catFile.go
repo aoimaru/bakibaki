@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	NUM_OF_ARGS = 1
+	NUM_OF_CF_ARGS = 1
 )
 
 // catFileCmd represents the catFile command
@@ -74,7 +74,7 @@ to quickly create a Cobra application.`,
  	},
 	Args: func(cmd *cobra.Command, args []string) error {
 		/** 引数のバリデーションを行うことができる */
-		if len(args) < NUM_OF_ARGS {
+		if len(args) < NUM_OF_CF_ARGS {
 			return errors.New("requires args")
 		}
 		return nil
