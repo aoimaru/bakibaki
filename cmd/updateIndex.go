@@ -8,14 +8,14 @@ import (
 	"fmt"
 	"os"
 	// "strings"
-	"errors"
+	// "errors"
 	"github.com/spf13/cobra"
 
 	"github.com/aoimaru/bakibaki/lib"
 )
-const (
-	NUM_OF_UI_ARGS = 2
-)
+// const (
+// 	NUM_OF_UI_ARGS = 2
+// )
 
 
 // updateIndexCmd represents the updateIndex command
@@ -62,19 +62,19 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			fmt.Println(err)
 		}
-
-
-		
-		lib.UpdateIndex(index, "Hello", "World")
-
-	},
-	Args: func(cmd *cobra.Command, args []string) error {
-		/** 引数のバリデーションを行うことができる */
-		if len(args) < NUM_OF_UI_ARGS {
-			return errors.New("requires args")
+		Nindex, filePath, err := lib.UpdateIndex(index, "bakibaki.py", "91d99df2dfd7d53d9a2d3015b8e305e827187d95", &client)
+		if err != nil {
+			fmt.Println(err)
 		}
-		return nil
+		lib.WriteIndex(Nindex, filePath)
 	},
+	// Args: func(cmd *cobra.Command, args []string) error {
+	// 	/** 引数のバリデーションを行うことができる */
+	// 	if len(args) != NUM_OF_UI_ARGS {
+	// 		return errors.New("requires args")
+	// 	}
+	// 	return nil
+	// },
 }
 
 func init() {

@@ -36,7 +36,9 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			fmt.Println(err)
 		}
-		lib.UpdateIndex(index, "hello", "world")
+		for _, entry := range (*index).Entries {
+			fmt.Println(entry.Name, entry.Hash)
+		}
 	},
 }
 
