@@ -165,6 +165,21 @@ func GetIndexObject(file_path string) (*Index, error) {
 
 func UpdateIndex(index *Index, name string, hash string) {
 	for _, entry := range (*index).Entries {
-
+		fmt.Println(entry)
 	}
+}
+
+
+func WriteIndex(index *Index, file_path string) (error) {
+	f, err := os.Open(file_path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	for _, entry := range (*index).Entries {
+		Bentry := []byte(entry)
+		fmt.Println(Bentry)
+	} 
+
 }
