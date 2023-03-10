@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	NUM_OF_HO_ARGS = 2
+	NUM_OF_HO_ARGS = 1
 )
 
 // hashObjectCmd represents the hashObject command

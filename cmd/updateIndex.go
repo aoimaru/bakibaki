@@ -50,7 +50,7 @@ to quickly create a Cobra application.`,
 		}
 
 		current, _ := os.Getwd()
-		GitRootPath, err := lib.FindGitRoot(current)
+		GitRootPath, err := lib.FindBakiBakiRoot(current)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -62,11 +62,15 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			fmt.Println(err)
 		}
-		Nindex, filePath, err := lib.UpdateIndex(index, "bakibaki.py", "91d99df2dfd7d53d9a2d3015b8e305e827187d95", &client)
+		// Nindex, filePath, err := lib.UpdateIndex(index, "bakibaki.py", "91d99df2dfd7d53d9a2d3015b8e305e827187d95", &client)
+		Nindex, _, err := lib.UpdateIndex(index, name, hash, &client)
 		if err != nil {
 			fmt.Println(err)
 		}
-		lib.WriteIndex(Nindex, filePath)
+		err = lib.WriteIndex(Nindex, indexPath)
+		if err != nil {
+			fmt.Println(err)
+		}
 	},
 	// Args: func(cmd *cobra.Command, args []string) error {
 	// 	/** 引数のバリデーションを行うことができる */

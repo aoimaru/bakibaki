@@ -265,12 +265,6 @@ func Uint642Byte(ui uint32) []byte {
 }
 
 func WriteIndex(index *Index, file_path string) error {
-	f, err := os.Open(file_path)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
 	buffer := make([]byte, 0)
 
 	bDirc := []byte((*index).Dirc)
@@ -337,10 +331,17 @@ func WriteIndex(index *Index, file_path string) error {
 		buffer = append(buffer, bPadding...)
 	}
 
-	_, err = f.Write(buffer)
+	w, err := os.Create(file_path)
 	if err != nil {
 		return err
 	}
+	defer w.Close()
+
+	count, err := w.Write(buffer)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("write %d bytes\n", count)
 
 	return errors.New("None")
 }
