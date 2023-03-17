@@ -50,7 +50,7 @@ to quickly create a Cobra application.`,
 		}
 
 		current, _ := os.Getwd()
-		GitRootPath, err := lib.FindBakiBakiRoot(current)
+		GitRootPath, err := lib.FindGitRoot(current)
 		if err != nil {
 			fmt.Println(err)
 		}
