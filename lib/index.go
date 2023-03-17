@@ -277,6 +277,8 @@ func WriteIndex(index *Index, file_path string) error {
 
 	for _, entry := range (*index).Entries {
 
+		fmt.Println(entry)
+
 		cUnix := entry.cTime.Unix()
 		bcUnix := make([]byte, 4)
 		binary.BigEndian.PutUint32(bcUnix, uint32(cUnix))
