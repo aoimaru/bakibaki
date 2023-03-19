@@ -5,8 +5,8 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	// "fmt"
-	// "os"
+	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/aoimaru/bakibaki/lib"
@@ -23,22 +23,22 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// current, _ := os.Getwd()
-		// GitRootPath, _ := lib.FindGitRoot(current)
-		// client := lib.Client{
-		// 	Root: GitRootPath,
-		// }
-		// indexPath := client.GetIndexPath()
-		// index, _ := lib.GetIndexObject(indexPath)
+		current, _ := os.Getwd()
+		GitRootPath, _ := lib.FindGitRoot(current)
+		client := lib.Client{
+			Root: GitRootPath,
+		}
+		indexPath := client.GetIndexPath()
+		index, _ := lib.GetIndexObject(indexPath)
 		
-		// newEntry, filePath, _ := lib.UpdateIndex(index, "bakibaki.py", "0e50249a75625c1b02a04103cca4a3027128da4c", &client)
-		// fmt.Println("filePath->", filePath)
-		// err := lib.WriteIndex(newEntry, "./index1")
-		// if err != nil {
-		// 	fmt.Println(err)
-		// }
+		newEntry, filePath, _ := lib.UpdateIndex(index, "bakibaki.py", "0e50249a75625c1b02a04103cca4a3027128da4c", &client)
+		fmt.Println("filePath->", filePath)
+		err := lib.WriteIndex(newEntry, "./index1")
+		if err != nil {
+			fmt.Println(err)
+		}
 
-		lib.TestIndex()
+		// lib.TestIndex()
 	},
 }
 
