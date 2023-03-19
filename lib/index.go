@@ -213,6 +213,7 @@ func UpdateIndex(index *Index, name string, hash string, client *Client) (*Index
 
 	fileInfo, err := os.Stat(filePath)
 	if err != nil {
+		fmt.Println(filePath)
 		return nil, "", err
 	}
 	oct := fmt.Sprintf("%o", uint32(sysC.Mode))
@@ -328,7 +329,10 @@ func WriteIndex(index *Index, file_path string) error {
 		bName := []byte(entry.Name)
 		buffer = append(buffer, bName...)
 
-		padding := GetPaddingSize(uint64(len(bName)))
+		var sw uint64
+		sw = 62
+
+		padding := GetPaddingSize(sw+uint64(len(bName)))
 		bPadding := make([]byte, padding)
 		buffer = append(buffer, bPadding...)
 	}

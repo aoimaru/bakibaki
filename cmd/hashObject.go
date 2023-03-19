@@ -37,11 +37,11 @@ to quickly create a Cobra application.`,
 			Root: GitRootPath,
 		}
 		path := args[0]
-		buffer, err := client.CreateBlobFile(path)
+		buffer, hash, err := client.CreateBlobFile(path)
 		if err != nil {
 			fmt.Println(err)
 		}
-		fmt.Println(string(buffer))
+		fmt.Println(string(buffer), hash)
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
 		/** 引数のバリデーションを行うことができる */

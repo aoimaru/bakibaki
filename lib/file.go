@@ -53,10 +53,10 @@ func File2Byte(file_path string, fType string) ([]byte, error) {
 }
 
 
-func (c *Client) CreateBlobFile(file_path string) ([]byte, error) {
+func (c *Client) CreateBlobFile(file_path string) ([]byte, string, error) {
 	buffer, err := File2Byte(file_path, "blob")
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	Pressed := Press(buffer)
@@ -68,32 +68,32 @@ func (c *Client) CreateBlobFile(file_path string) ([]byte, error) {
 
 	hashPath, err := hash2Path(hash)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	hashDir, err := hash2PathDir(hash)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	if _, err := os.Stat(c.Root+hashDir); err != nil {
 		if err := os.MkdirAll(c.Root+hashDir, 1755); err != nil {
-			return nil, err
+			return nil, "", err
 		}
 	}
 
 	w, err := os.Create(c.Root+hashPath)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	defer w.Close()
 
 	count, err := w.Write(Pressed)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	fmt.Println(hash)
 	fmt.Printf("write %d bytes\n", count)
 	
-	return Pressed, nil
+	return Pressed, hash, nil
 
 
 }
