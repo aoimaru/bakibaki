@@ -10,6 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/aoimaru/bakibaki/lib"
+	"github.com/aoimaru/bakibaki/test"
 )
 
 // testCmd represents the test command
@@ -31,14 +32,19 @@ to quickly create a Cobra application.`,
 		indexPath := client.GetIndexPath()
 		index, _ := lib.GetIndexObject(indexPath)
 		
-		newEntry, filePath, _ := lib.UpdateIndex(index, "bakibaki.py", "0e50249a75625c1b02a04103cca4a3027128da4c", &client)
-		fmt.Println("filePath->", filePath)
-		err := lib.WriteIndex(newEntry, "./index1")
-		if err != nil {
-			fmt.Println(err)
-		}
+		// newEntry, filePath, _ := lib.UpdateIndex(index, "bakibaki.py", "0e50249a75625c1b02a04103cca4a3027128da4c", &client)
+		// fmt.Println("filePath->", filePath)
+		// err := lib.WriteIndex(newEntry, "./index1")
+		// if err != nil {
+		// 	fmt.Println(err)
+		// }
 
 		// lib.TestIndex()
+
+		
+		fmt.Println("---> test!!")
+		test.WriteIndexHeaderTest(index)
+		
 	},
 }
 
