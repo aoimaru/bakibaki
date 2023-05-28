@@ -138,6 +138,7 @@ func CreateIndex(buffer []byte) (*Index, error) {
 	var count uint32
 	count = 0
 	for {
+		fmt.Println()
 		if count >= enum {
 			break
 		}
@@ -166,9 +167,19 @@ func CreateIndex(buffer []byte) (*Index, error) {
 		uid := Bytes2Uint32(buffer[28:32])
 		gid := Bytes2Uint32(buffer[32:36])
 		size := Bytes2Uint32(buffer[36:40])
+		// fmt.Println("size:", Bytes2Uint32(buffer[36:40]))
+
 		hash := hex.EncodeToString(buffer[40:60])
+		// fmt.Println("hash:", hex.EncodeToString(buffer[40:60]))
+
 		nsize := Bytes2uint(buffer[60:62])
+		// fmt.Println("nsize:", Bytes2uint(buffer[60:62]))
+
+
 		name := string(buffer[62 : 62+nsize])
+
+		// fmt.Println("name:", string(buffer[62:68]))
+		// fmt.Println("name:", string(buffer[62 : 62+nsize]))
 
 		entry := Entry{
 			cTime: ctime,

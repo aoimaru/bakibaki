@@ -8,9 +8,10 @@ import (
 	"encoding/hex"
 
 	// "reflect"
+	// "github.com/aoimaru/bakibaki/lib"
 )
 
-/** インデックスへの書き込みの際のバイト列にバグが発生 */
+/** インデックスへの書き込みの際のバイト列にバグが発生<=書き込みは問題なかった */
 
 type Old struct {
 	Name string

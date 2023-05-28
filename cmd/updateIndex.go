@@ -49,27 +49,53 @@ to quickly create a Cobra application.`,
 			return
 		}
 
+		// BakiBakiリポジトリのルートパスを取得
 		current, _ := os.Getwd()
-		GitRootPath, err := lib.FindBakiBakiRoot(current)
+		// GitRootPath, err := lib.FindBakiBakiRoot(current)
+		GitRootPath, err := lib.FindGitRoot(current)
 		if err != nil {
 			fmt.Println(err)
 		}
 		client := lib.Client{
 			Root: GitRootPath,
 		}
+
+		// indexファイルをオブジェクトとして取得
 		indexPath := client.GetIndexPath()
 		index, err := lib.GetIndexObject(indexPath)
 		if err != nil {
 			fmt.Println(err)
 		}
+
+
+		for _, entry := range index.Entries {
+			fmt.Println("Index", entry)
+		}
 		// Nindex, filePath, err := lib.UpdateIndex(index, "bakibaki.py", "91d99df2dfd7d53d9a2d3015b8e305e827187d95", &client)
-		Nindex, _, err := lib.UpdateIndex(index, name, hash, &client)
+		// Nindex, _, err := lib.UpdateIndex(index, name, hash, &client)
+		// if err != nil {
+		// 	fmt.Println(err)
+		// }
+		// err = lib.WriteIndex(Nindex, indexPath)
+		// if err != nil {
+		// 	fmt.Println(err)
+		// }
+
+
+		
+
+		fmt.Println("current:", current)
+		err = lib.WriteIndex(index, current+"/subIndex")
 		if err != nil {
 			fmt.Println(err)
 		}
-		err = lib.WriteIndex(Nindex, indexPath)
+		subIndex, err := lib.GetIndexObject(indexPath)
 		if err != nil {
 			fmt.Println(err)
+		}
+
+		for _, entry := range subIndex.Entries {
+			fmt.Println("subIndex:", entry)
 		}
 	},
 	// Args: func(cmd *cobra.Command, args []string) error {
