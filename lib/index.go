@@ -10,16 +10,16 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
 	// "reflect"
 	"encoding/hex"
 	// "io/ioutil"
 	"github.com/aoimaru/bakibaki/util"
 )
 
-
 type Entry struct {
-	cTime time.Time
-	mTime time.Time
+	CTime time.Time
+	MTime time.Time
 	Dev   uint32
 	Inode uint32
 	Mode  uint32
@@ -145,14 +145,14 @@ func CreateIndex(buffer []byte) (*Index, error) {
 		}
 		count++
 
-		ctime, err := GetUnixTime(Bytes2uint(buffer[0:4]))
+		CTime, err := GetUnixTime(Bytes2uint(buffer[0:4]))
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
 		_ = Bytes2str(buffer[4:8])
 
-		mtime, err := GetUnixTime(Bytes2uint(buffer[8:12]))
+		MTime, err := GetUnixTime(Bytes2uint(buffer[8:12]))
 		if err != nil {
 			fmt.Println(err)
 			continue
@@ -176,15 +176,14 @@ func CreateIndex(buffer []byte) (*Index, error) {
 		nsize := Bytes2uint(buffer[60:62])
 		// fmt.Println("nsize:", Bytes2uint(buffer[60:62]))
 
-
 		name := string(buffer[62 : 62+nsize])
 
 		// fmt.Println("name:", string(buffer[62:68]))
 		// fmt.Println("name:", string(buffer[62 : 62+nsize]))
 
 		entry := Entry{
-			cTime: ctime,
-			mTime: mtime,
+			CTime: CTime,
+			MTime: MTime,
 			Dev:   dev,
 			Inode: inode,
 			Mode:  mode,
@@ -236,8 +235,8 @@ func UpdateIndex(index *Index, name string, hash string, client *Client) (*Index
 	}
 	mode := uint32(num)
 	Nentry := Entry{
-		cTime: fileInfo.ModTime(),
-		mTime: fileInfo.ModTime(),
+		CTime: fileInfo.ModTime(),
+		MTime: fileInfo.ModTime(),
 		Dev:   uint32(sysC.Dev),
 		Inode: uint32(sysC.Ino),
 		Mode:  mode,
@@ -264,7 +263,7 @@ func UpdateIndex(index *Index, name string, hash string, client *Client) (*Index
 			continue
 		}
 		Nindex.Entries = append(Nindex.Entries, entry)
-		Nentry.cTime = entry.cTime /** ここでファイルの作成時間を遺伝*/
+		Nentry.CTime = entry.CTime /** ここでファイルの作成時間を遺伝*/
 	}
 
 	Nindex.Entries = append(Nindex.Entries, Nentry)
@@ -293,13 +292,13 @@ func WriteIndex(index *Index, file_path string) error {
 
 		fmt.Println(entry)
 
-		cUnix := entry.cTime.Unix()
+		cUnix := entry.CTime.Unix()
 		bcUnix := make([]byte, 4)
 		binary.BigEndian.PutUint32(bcUnix, uint32(cUnix))
 		buffer = append(buffer, bcUnix...)
 		buffer = append(buffer, bcUnix...)
 
-		mUnix := entry.mTime.Unix()
+		mUnix := entry.MTime.Unix()
 		bmUnix := make([]byte, 4)
 		binary.BigEndian.PutUint32(bmUnix, uint32(mUnix))
 		buffer = append(buffer, bmUnix...)
@@ -345,7 +344,7 @@ func WriteIndex(index *Index, file_path string) error {
 		var sw uint64
 		sw = 62
 
-		padding := GetPaddingSize(sw+uint64(len(bName)))
+		padding := GetPaddingSize(sw + uint64(len(bName)))
 		bPadding := make([]byte, padding)
 		buffer = append(buffer, bPadding...)
 	}

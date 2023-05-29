@@ -1,12 +1,9 @@
 package lib
 
-
-
 import (
-	"fmt"
 	"encoding/binary"
 	"encoding/hex"
-
+	"fmt"
 	// "reflect"
 	// "github.com/aoimaru/bakibaki/lib"
 )
@@ -14,10 +11,9 @@ import (
 /** インデックスへの書き込みの際のバイト列にバグが発生<=書き込みは問題なかった */
 
 type Old struct {
-	Name string
+	Name   string
 	Buffer []byte
 }
-
 
 func TestIndex() {
 	indexPath := ".git/index"
@@ -29,14 +25,10 @@ func TestIndex() {
 	}
 	index, _ := CreateIndex(oldBuffer)
 
-
-
-
 	numOfEntry := Bytes2Uint32(oldBuffer[8:12])
 	oldBuffer = oldBuffer[12:]
 
 	var olds []Old
-
 
 	var count uint32
 	count = 0
@@ -49,13 +41,13 @@ func TestIndex() {
 		nsize := Bytes2uint(oldBuffer[60:62])
 		name := string(oldBuffer[62 : 62+nsize])
 		fmt.Println(name)
-		padding := GetPaddingSize(62+nsize)
-		offset := 62+nsize+padding
+		padding := GetPaddingSize(62 + nsize)
+		offset := 62 + nsize + padding
 
 		fmt.Println("padding->", padding, ": offset:>", offset)
 
 		old := Old{
-			Name: name,
+			Name:   name,
 			Buffer: oldBuffer[:offset],
 		}
 
@@ -65,8 +57,6 @@ func TestIndex() {
 	}
 
 	fmt.Println("len->", len(olds), "NOE->", numOfEntry)
-
-
 
 	buffer := make([]byte, 0)
 
@@ -83,13 +73,13 @@ func TestIndex() {
 		// fmt.Println(entry)
 		buffer = make([]byte, 0)
 
-		cUnix := entry.cTime.Unix()
+		cUnix := entry.CTime.Unix()
 		bcUnix := make([]byte, 4)
 		binary.BigEndian.PutUint32(bcUnix, uint32(cUnix))
 		buffer = append(buffer, bcUnix...)
 		buffer = append(buffer, bcUnix...)
 
-		mUnix := entry.mTime.Unix()
+		mUnix := entry.MTime.Unix()
 		bmUnix := make([]byte, 4)
 		binary.BigEndian.PutUint32(bmUnix, uint32(mUnix))
 		buffer = append(buffer, bmUnix...)
@@ -135,7 +125,7 @@ func TestIndex() {
 		var sw uint64
 		sw = 62
 
-		padding := GetPaddingSize(sw+uint64(len(bName)))
+		padding := GetPaddingSize(sw + uint64(len(bName)))
 		bPadding := make([]byte, padding)
 
 		buffer = append(buffer, bPadding...)
@@ -150,6 +140,5 @@ func TestIndex() {
 	}
 
 	// fmt.Println(reflect.DeepEqual(oldBuffer, buffer))
-
 
 }

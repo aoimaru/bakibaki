@@ -18,7 +18,6 @@ import (
 
 	"strconv"
 	"syscall"
-	"time"
 )
 
 // testCmd represents the test command
@@ -71,22 +70,9 @@ to quickly create a Cobra application.`,
 		}
 		mode := uint32(num)
 
-		type Entry struct {
-			cTime time.Time
-			mTime time.Time
-			Dev   uint32
-			Inode uint32
-			Mode  uint32
-			Uid   uint32
-			Gid   uint32
-			Size  uint32
-			Hash  string
-			Name  string
-		}
-
-		Nentry := Entry{
-			cTime: fileInfo.ModTime(),
-			mTime: fileInfo.ModTime(),
+		Nentry := lib.Entry{
+			CTime: fileInfo.ModTime(),
+			MTime: fileInfo.ModTime(),
 			Dev:   uint32(sysC.Dev),
 			Inode: uint32(sysC.Ino),
 			Mode:  mode,
@@ -97,15 +83,8 @@ to quickly create a Cobra application.`,
 			Name:  name,
 		}
 
-		type Index2 struct {
-			Dirc    string
-			Version uint32
-			Number  uint32
-			Entries []Entry
-		}
-
 		fmt.Printf("%+v", Nentry)
-		var index2 Index2
+		var index2 lib.Index
 		index2.Dirc = "DIRC"
 		index2.Version = 2
 		index2.Number = 1
@@ -130,12 +109,12 @@ to quickly create a Cobra application.`,
 
 			fmt.Println(entry)
 
-			c_unix := entry.cTime.Unix()
+			c_unix := entry.CTime.Unix()
 			buf_c_unix := util.Element2byte32(uint32(c_unix))
 			buffer = append(buffer, buf_c_unix...)
 			buffer = append(buffer, buf_c_unix...)
 
-			m_unix := entry.mTime.Unix()
+			m_unix := entry.MTime.Unix()
 			buf_m_unix := util.Element2byte32(uint32(m_unix))
 			buffer = append(buffer, buf_m_unix...)
 			buffer = append(buffer, buf_m_unix...)
