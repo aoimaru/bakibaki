@@ -2,9 +2,9 @@ package util
 
 import (
 	"encoding/binary"
-	"time"
 	"fmt"
 	"strconv"
+	"time"
 )
 
 const PADDING_BYTE_TO_UINT64_IS_8 = 8
@@ -32,7 +32,6 @@ func Bytes2Uint16(bytes []byte) uint16 {
 	return artifact
 }
 
-
 func Byte2UnixTimeStamp(times uint64) (time.Time, error) {
 	int64time := int64(times)
 	var offsetHour, offsetMinute int
@@ -56,3 +55,13 @@ func Byte2Mode(bytes []byte) (uint32, error) {
 	return uint32Num, nil
 }
 
+func Element2byte32(index_line uint32) []byte {
+	buffer := make([]byte, 4)
+	binary.BigEndian.PutUint32(buffer, index_line)
+	return buffer
+}
+
+func GetPaddingSize(had uint64) uint64 {
+	Rem := had % 8
+	return 8 - Rem
+}

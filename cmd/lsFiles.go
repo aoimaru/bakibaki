@@ -7,8 +7,9 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"github.com/spf13/cobra"
+
 	"github.com/aoimaru/bakibaki/lib"
+	"github.com/spf13/cobra"
 )
 
 // lsFilesCmd represents the lsFiles command
@@ -34,7 +35,7 @@ to quickly create a Cobra application.`,
 		indexPath := client.GetIndexPath()
 		fmt.Println(indexPath)
 		// index, err := lib.GetIndexObject(indexPath)
-		index, err := lib.GetIndexObject("./subIndex")
+		index, err := lib.GetIndexObject("/mnt/c/Users/81701/Documents/AtCoder/subsubIndex")
 		if err != nil {
 			fmt.Println(err)
 		}

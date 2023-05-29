@@ -5,15 +5,19 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"os"
 
-	"github.com/spf13/cobra"
 	"github.com/aoimaru/bakibaki/lib"
+	"github.com/aoimaru/bakibaki/util"
+	"github.com/spf13/cobra"
+
 	// "github.com/aoimaru/bakibaki/test"
 
-	"syscall"
 	"strconv"
+	"syscall"
 	"time"
 )
 
@@ -40,14 +44,14 @@ to quickly create a Cobra application.`,
 		for _, entry := range (*index).Entries {
 			fmt.Println(entry.Name, entry.Hash, entry.Size)
 		}
-		
+
 		fmt.Println("")
 		// test.WriteIndexHeaderTest(index)
 
 		name := "typical90/032_TLE-2.py"
 		hash := "f131105cf1b5940a07b76f2608ea605f1ebcf2c7"
 
-		filePath := current+"/"+name
+		filePath := current + "/" + name
 		fmt.Println(hash)
 
 		var sysC syscall.Stat_t
@@ -79,7 +83,7 @@ to quickly create a Cobra application.`,
 			Hash  string
 			Name  string
 		}
-		
+
 		Nentry := Entry{
 			cTime: fileInfo.ModTime(),
 			mTime: fileInfo.ModTime(),
@@ -108,11 +112,93 @@ to quickly create a Cobra application.`,
 
 		index2.Entries = append(index2.Entries, Nentry)
 
+		for _, entry := range (index2).Entries {
+			fmt.Println(entry)
+		}
 
+		buffer := make([]byte, 0)
 
-		
+		dirc := []byte(index2.Dirc)
+		version := util.Element2byte32(index2.Version)
+		number := util.Element2byte32(index2.Number)
 
-		
+		buffer = append(buffer, dirc...)
+		buffer = append(buffer, version...)
+		buffer = append(buffer, number...)
+
+		for _, entry := range index2.Entries {
+
+			fmt.Println(entry)
+
+			c_unix := entry.cTime.Unix()
+			buf_c_unix := util.Element2byte32(uint32(c_unix))
+			buffer = append(buffer, buf_c_unix...)
+			buffer = append(buffer, buf_c_unix...)
+
+			m_unix := entry.mTime.Unix()
+			buf_m_unix := util.Element2byte32(uint32(m_unix))
+			buffer = append(buffer, buf_m_unix...)
+			buffer = append(buffer, buf_m_unix...)
+
+			dev := entry.Dev
+			buf_dev := util.Element2byte32(uint32(dev))
+			buffer = append(buffer, buf_dev...)
+
+			inode := entry.Inode
+			buffer_inode := util.Element2byte32(uint32(inode))
+			buffer = append(buffer, buffer_inode...)
+
+			mode := entry.Mode
+			buffer_mode := util.Element2byte32(uint32(mode))
+			buffer = append(buffer, buffer_mode...)
+
+			uid := entry.Uid
+			buffer_uid := util.Element2byte32(uint32(uid))
+			buffer = append(buffer, buffer_uid...)
+
+			gid := entry.Gid
+			buffer_gid := util.Element2byte32(uint32(gid))
+			buffer = append(buffer, buffer_gid...)
+
+			size := entry.Size
+			buffer_size := util.Element2byte32(uint32(size))
+			buffer = append(buffer, buffer_size...)
+
+			bHash, err := hex.DecodeString(entry.Hash)
+			if err != nil {
+				continue
+			}
+			buffer = append(buffer, bHash...)
+
+			bnSize := make([]byte, 2)
+			binary.BigEndian.PutUint16(bnSize, uint16(len(entry.Name)))
+			buffer = append(buffer, bnSize...)
+
+			bName := []byte(entry.Name)
+			buffer = append(buffer, bName...)
+
+			var sw uint64
+			sw = 62
+
+			padding := util.GetPaddingSize(sw + uint64(len(bName)))
+			bPadding := make([]byte, padding)
+			buffer = append(buffer, bPadding...)
+		}
+
+		w, err := os.Create("/mnt/c/Users/81701/Documents/AtCoder/subsubIndex")
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer w.Close()
+
+		count, err := w.Write(buffer)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Printf("write %d bytes\n", count)
+
+		// return errors.New("None")
+
 	},
 }
 
