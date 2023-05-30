@@ -35,12 +35,13 @@ to quickly create a Cobra application.`,
 		indexPath := client.GetIndexPath()
 		fmt.Println(indexPath)
 		// index, err := lib.GetIndexObject(indexPath)
-		index, err := lib.GetIndexObject("/mnt/c/Users/81701/Documents/AtCoder/subsubIndex")
+		index, err := lib.GetIndexObject("/mnt/c/Users/81701/Documents/AtCoder/subsubsubIndex")
 		if err != nil {
 			fmt.Println(err)
 		}
+		fmt.Println("OK?")
 		for _, entry := range (*index).Entries {
-			fmt.Println(entry.Name, entry.Hash)
+			fmt.Println("??", entry.Name, entry.Hash)
 		}
 	},
 }

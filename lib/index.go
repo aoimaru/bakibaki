@@ -128,6 +128,8 @@ func CreateIndex(buffer []byte) (*Index, error) {
 
 	enum := Bytes2Uint32(buffer[8:12])
 
+	fmt.Println("EUNM:", enum)
+
 	buffer = buffer[12:]
 
 	var index Index

@@ -40,11 +40,11 @@ to quickly create a Cobra application.`,
 		index, _ := lib.GetIndexObject(indexPath)
 		// _, _ = lib.GetIndexObject(indexPath)
 
-		for _, entry := range (*index).Entries {
-			fmt.Println(entry.Name, entry.Hash, entry.Size)
-		}
+		// for _, entry := range (*index).Entries {
+		// 	fmt.Println(entry.Name, entry.Hash, entry.Size)
+		// }
 
-		fmt.Println("")
+		// fmt.Println("")
 		// test.WriteIndexHeaderTest(index)
 
 		name := "typical90/032_TLE-2.py"
@@ -87,7 +87,7 @@ to quickly create a Cobra application.`,
 		var index2 lib.Index
 		index2.Dirc = "DIRC"
 		index2.Version = 2
-		index2.Number = 1
+		index2.Number = 100
 
 		index2.Entries = append(index2.Entries, Nentry)
 
@@ -105,7 +105,7 @@ to quickly create a Cobra application.`,
 		buffer = append(buffer, version...)
 		buffer = append(buffer, number...)
 
-		for _, entry := range index2.Entries {
+		for _, entry := range (*index).Entries[:100] {
 
 			fmt.Println(entry)
 
@@ -164,7 +164,7 @@ to quickly create a Cobra application.`,
 			buffer = append(buffer, bPadding...)
 		}
 
-		w, err := os.Create("/mnt/c/Users/81701/Documents/AtCoder/subsubIndex")
+		w, err := os.Create("/mnt/c/Users/81701/Documents/AtCoder/subsubsubIndex")
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -175,7 +175,7 @@ to quickly create a Cobra application.`,
 			fmt.Println(err)
 		}
 		fmt.Printf("write %d bytes\n", count)
-
+		fmt.Println("TEST")
 		// return errors.New("None")
 
 	},
