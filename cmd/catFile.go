@@ -7,11 +7,13 @@ package cmd
 import (
 	"fmt"
 	"os"
+
 	"github.com/spf13/cobra"
 
 	"errors"
-	"github.com/aoimaru/bakibaki/lib"
 	"strings"
+
+	"github.com/aoimaru/bakibaki/lib"
 )
 
 const (
@@ -30,12 +32,12 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		current, _ := os.Getwd()
-		// GitRootPath, err := lib.FindGitRoot(current)
-		GitRootPath, err := lib.FindBakiBakiRoot(current)
+		GitRootPath, err := lib.FindGitRoot(current)
+		// GitRootPath, err := lib.FindBakiBakiRoot(current)
 		if err != nil {
 			fmt.Println(err)
 		}
-		
+
 		hash := args[0]
 		client := lib.Client{
 			Root: GitRootPath,
@@ -67,11 +69,11 @@ to quickly create a Cobra application.`,
 			commit, err := lib.CreateCommitObject(Header, Content)
 			if err != nil {
 				fmt.Println(err)
-			
+
 			}
 			commit.Format()
 		}
- 	},
+	},
 	Args: func(cmd *cobra.Command, args []string) error {
 		/** 引数のバリデーションを行うことができる */
 		if len(args) < NUM_OF_CF_ARGS {

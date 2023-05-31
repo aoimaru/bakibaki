@@ -1,14 +1,13 @@
-
 package lib
 
 import (
-	"fmt"
 	"bytes"
-	"os"
-	"strconv"
 	"compress/zlib"
 	"crypto/sha1"
-    "encoding/hex"
+	"encoding/hex"
+	"fmt"
+	"os"
+	"strconv"
 	// "io"
 	// "reflect"
 )
@@ -22,15 +21,14 @@ func Press(buffer []byte) []uint8 {
 	return Pressed.Bytes()
 }
 
-func GetFileMeta(f *os.File, fType string) ([]byte, error){
+func GetFileMeta(f *os.File, fType string) ([]byte, error) {
 	info, err := f.Stat()
 	if err != nil {
 		return nil, err
 	}
 	size := strconv.FormatInt(info.Size(), 10)
-	return []byte(fType+" "+size), nil
+	return []byte(fType + " " + size), nil
 }
-
 
 func File2Byte(file_path string, fType string) ([]byte, error) {
 	f, err := os.Open(file_path)
@@ -52,7 +50,6 @@ func File2Byte(file_path string, fType string) ([]byte, error) {
 	return buffer, nil
 }
 
-
 func (c *Client) CreateBlobFile(file_path string) ([]byte, string, error) {
 	buffer, err := File2Byte(file_path, "blob")
 	if err != nil {
@@ -63,7 +60,7 @@ func (c *Client) CreateBlobFile(file_path string) ([]byte, string, error) {
 
 	sha1 := sha1.New()
 	sha1.Write(buffer)
-	
+
 	hash := hex.EncodeToString(sha1.Sum(nil))
 
 	hashPath, err := hash2Path(hash)
@@ -74,13 +71,13 @@ func (c *Client) CreateBlobFile(file_path string) ([]byte, string, error) {
 	if err != nil {
 		return nil, "", err
 	}
-	if _, err := os.Stat(c.Root+hashDir); err != nil {
+	if _, err := os.Stat(c.Root + hashDir); err != nil {
 		if err := os.MkdirAll(c.Root+hashDir, 1755); err != nil {
 			return nil, "", err
 		}
 	}
 
-	w, err := os.Create(c.Root+hashPath)
+	w, err := os.Create(c.Root + hashPath)
 	if err != nil {
 		return nil, "", err
 	}
@@ -92,9 +89,8 @@ func (c *Client) CreateBlobFile(file_path string) ([]byte, string, error) {
 	}
 	fmt.Println(hash)
 	fmt.Printf("write %d bytes\n", count)
-	
-	return Pressed, hash, nil
 
+	return Pressed, hash, nil
 
 }
 
@@ -105,4 +101,3 @@ func CreateTreeFile(file_path string) {
 func CreateCommitFile(file_path string) {
 
 }
-

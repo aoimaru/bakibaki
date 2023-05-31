@@ -32,8 +32,9 @@ to quickly create a Cobra application.`,
 			Root: GitRootPath,
 		}
 		fmt.Printf("%+v\n", client)
-		latest := "798d1418b07d03202058bfde85cae77449bb998c"
+		// latest := "798d1418b07d03202058bfde85cae77449bb998c"
 		// latest := "52989a2e4522aef5ccabd9c7ae0ade5e70fe1c91"
+		latest := "c5c96d548128df26ea5f5d9e32b28c38133d2019"
 		fmt.Println(latest)
 		lib.WalkGitLog(client, latest)
 	},
