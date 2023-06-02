@@ -6,7 +6,10 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/aoimaru/bakibaki/lib"
+	"github.com/aoimaru/bakibaki/util"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +24,24 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("writeTree called")
+		// BakiBakiリポジトリのルートパスを取得
+		current, _ := os.Getwd()
+		// GitRootPath, err := lib.FindBakiBakiRoot(current)
+		GitRootPath, err := lib.FindGitRoot(current)
+		if err != nil {
+			fmt.Println(err)
+		}
+		client := lib.Client{
+			Root: GitRootPath,
+		}
+
+		// indexファイルをオブジェクトとして取得
+		indexPath := client.GetIndexPath()
+		index, err := lib.GetIndexObject(indexPath)
+		if err != nil {
+			fmt.Println(err)
+		}
+		util.CreateTree(index)
 	},
 }
 

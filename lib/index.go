@@ -14,7 +14,6 @@ import (
 	// "reflect"
 	"encoding/hex"
 	// "io/ioutil"
-	"github.com/aoimaru/bakibaki/util"
 )
 
 type Entry struct {
@@ -120,7 +119,7 @@ func CreateIndex(buffer []byte) (*Index, error) {
 		return nil, errors.New("NOT INDEX FILE")
 	}
 
-	version := util.Bytes2Uint32(buffer[4:8])
+	version := Bytes2Uint32(buffer[4:8])
 	if version != 2 {
 		err := errors.New("Invalid Version Error")
 		return nil, err

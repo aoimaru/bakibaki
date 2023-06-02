@@ -74,6 +74,7 @@ to quickly create a Cobra application.`,
 		fileInfo, err := os.Stat(filePath)
 		if err != nil {
 			fmt.Println(filePath, err)
+			return
 		}
 
 		// fmt.Println(fileInfo)
