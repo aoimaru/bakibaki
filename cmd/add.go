@@ -47,6 +47,7 @@ to quickly create a Cobra application.`,
 		buffers, hash, err := bakibaki_client.CreateBlobFile(name)
 		if err != nil {
 			fmt.Println(err)
+			return
 		}
 		fmt.Println(string(buffers), hash)
 
