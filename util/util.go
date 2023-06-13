@@ -12,6 +12,7 @@ const PADDING_BYTE_TO_UINT32_IS_4 = 4
 const PADDING_BYTE_TO_UINT16_IS_2 = 2
 
 func Bytes2uint64(bytes []byte) uint64 {
+	// byte列を, entry objectに変換する際に利用
 	padding := make([]byte, PADDING_BYTE_TO_UINT64_IS_8-len(bytes))
 	source := append(padding, bytes...)
 	artifact := binary.BigEndian.Uint64(source)
@@ -56,6 +57,7 @@ func Byte2Mode(bytes []byte) (uint32, error) {
 }
 
 func Element2byte32(index_line uint32) []byte {
+	// entry objectをバイト列に変換する際に利用
 	buffer := make([]byte, 4)
 	binary.BigEndian.PutUint32(buffer, index_line)
 	return buffer
