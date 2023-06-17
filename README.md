@@ -42,3 +42,8 @@ lib/file.goの53行目あたりから
 で, 圧縮する 参考サイト(https://text.baldanders.info/golang/compress-data/) 
 
 3. バイト列からハッシュ値を作成して, ファイル名として, ファイルに2で作成した圧縮データを格納する
+
+## catFileと, writeTreeの実装 仕様を変えたい
+tree [\0]
+40000 ABC/[\0]fh@q3reva@duvnas@dc <-これを
+40000 ABC/　fh@q3reva@duvnas@d [\0] か [\0]40000 ABC/　fh@q3reva@duvnas@d にしたい
