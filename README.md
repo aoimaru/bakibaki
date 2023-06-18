@@ -47,3 +47,5 @@ lib/file.goの53行目あたりから
 tree [\0]
 40000 ABC/[\0]fh@q3reva@duvnas@dc <-これを
 40000 ABC/　fh@q3reva@duvnas@d [\0] か [\0]40000 ABC/　fh@q3reva@duvnas@d にしたい
+
+参考(https://github.com/aoimaru/WriteTreeRecursion/blob/master/main.go)
