@@ -94,7 +94,7 @@ func (c *Commit) Format() {
 	fmt.Println("Message  :", c.Message)
 }
 
-type Client struct {
+type Client_v2 struct {
 	Root string
 }
 
@@ -107,12 +107,11 @@ func hash2Path(hash string) (string, error) {
 	return hashPath, nil
 }
 
-
 func hash2PathDir(hash string) (string, error) {
 	if len(hash) <= LENGTH_OF_HASH {
 		return "", errors.New("Invalid Hash")
 	}
-	DirPath:= hash[:2]
+	DirPath := hash[:2]
 	hashPath := "/objects/" + DirPath
 	return hashPath, nil
 }
@@ -191,9 +190,9 @@ func (c *Client) GetGitObject(hash string) ([]byte, error) {
 	return Zbuffer, nil
 }
 
-func (c *Client) GetIndexPath() (string) {
+func (c *Client) GetIndexPath() string {
 	indexPath := "/index"
-	return c.Root+indexPath
+	return c.Root + indexPath
 }
 
 func Create3TObject(lineMeta string) string {

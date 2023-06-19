@@ -3,9 +3,6 @@ package lib
 import (
 	"bytes"
 	"compress/zlib"
-	"crypto/sha1"
-	"encoding/hex"
-	"fmt"
 	"os"
 	"strconv"
 	// "io"
@@ -50,47 +47,7 @@ func File2Byte(file_path string, fType string) ([]byte, error) {
 	return buffer, nil
 }
 
-func (c *Client) CreateBlobFile(file_path string) ([]byte, string, error) {
-	buffer, err := File2Byte(file_path, "blob")
-	if err != nil {
-		return nil, "", err
-	}
-
-	Pressed := Press(buffer)
-
-	sha1 := sha1.New()
-	sha1.Write(buffer)
-
-	hash := hex.EncodeToString(sha1.Sum(nil))
-
-	hashPath, err := hash2Path(hash)
-	if err != nil {
-		return nil, "", err
-	}
-	hashDir, err := hash2PathDir(hash)
-	if err != nil {
-		return nil, "", err
-	}
-	if _, err := os.Stat(c.Root + hashDir); err != nil {
-		if err := os.MkdirAll(c.Root+hashDir, 1755); err != nil {
-			return nil, "", err
-		}
-	}
-
-	w, err := os.Create(c.Root + hashPath)
-	if err != nil {
-		return nil, "", err
-	}
-	defer w.Close()
-
-	count, err := w.Write(Pressed)
-	if err != nil {
-		return nil, "", err
-	}
-	fmt.Println(hash)
-	fmt.Printf("write %d bytes\n", count)
-
-	return Pressed, hash, nil
+func (c *Client_v2) CreateBlobFile(file_path string) {
 
 }
 
