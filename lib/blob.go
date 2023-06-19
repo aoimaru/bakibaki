@@ -26,6 +26,7 @@ func (c *Client) CreateBlobFile(file_path string) ([]byte, string, error) {
 	if err != nil {
 		return nil, "", err
 	}
+	file_header = append(file_header, 0)
 	buffer = append(file_header, buffer...)
 
 	var compressed bytes.Buffer
@@ -63,5 +64,3 @@ func (c *Client) CreateBlobFile(file_path string) ([]byte, string, error) {
 	return compressed_buffer, hash, nil
 
 }
-
-

@@ -161,13 +161,12 @@ func Header3Content(buffer *[]byte) ([]byte, []byte, error) {
 }
 
 func (c *Client) GetGitObject(hash string) ([]byte, error) {
-	hashPath, err := hash2Path(hash)
+	hash_rel_path, err := hash2Path(hash)
 	if err != nil {
 		return nil, err
 	}
-	ObjectPath := c.Root + hashPath
-	// fmt.Println("ObjectPath:", ObjectPath)
-	f, err := os.Open(ObjectPath)
+	object_abs_path := c.Root + hash_rel_path
+	f, err := os.Open(object_abs_path)
 	if err != nil {
 		fmt.Println(err)
 		return nil, errors.New("where??")
