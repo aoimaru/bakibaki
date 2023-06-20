@@ -39,9 +39,15 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			fmt.Println(err)
 		}
+		nodes := index.CreateNodes()
+		for _, node := range nodes {
+			if (*node).Path == "root" {
+				root_tree_hash := lib.WriteTree(node, &index)
+				fmt.Println(root_tree_hash)
 
-		for _, entry := range index.Entries {
-			fmt.Println("index:", entry.Name, entry.Hash)
+				lib.CatFile(root_tree_hash)
+				break
+			}
 		}
 	},
 }
