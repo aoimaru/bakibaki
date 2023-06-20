@@ -34,11 +34,7 @@ to quickly create a Cobra application.`,
 		}
 		index_path := client.GetIndexPath()
 		fmt.Println(index_path)
-		// indexファイルが存在しない場合は,終了したいけど #TODO ここにバグ
-		// if !lib.IsExist(index_path) {
-		// 	fmt.Println("index is not existed ---> ")
-		// 	return
-		// }
+
 		index, err := client.GetIndexObject(index_path)
 		if err != nil {
 			fmt.Println(err)

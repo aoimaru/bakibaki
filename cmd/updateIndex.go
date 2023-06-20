@@ -60,15 +60,6 @@ to quickly create a Cobra application.`,
 		// indexファイルをオブジェクトとして取得
 		index_path := client.GetIndexPath()
 
-		// indexファイルが存在しない場合は, エントリーが空のindexファイルを作成する
-		// バグ
-		// if !lib.IsExist(index_path) {
-		// 	fmt.Println("index is not existed")
-		// 	index := lib.InitIndexObject()
-		// 	index_buffer := index.AsByte()
-		// 	index_buffer.ToFile(index_path)
-		// }
-
 		index, err := client.GetIndexObject(index_path)
 		if err != nil {
 			fmt.Println(err)

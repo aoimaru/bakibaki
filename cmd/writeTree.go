@@ -23,26 +23,26 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// BakiBakiリポジトリのルートパスを取得
 		current, _ := os.Getwd()
-		// GitRootPath, err := lib.FindBakiBakiRoot(current)
-		GitRootPath, err := lib.FindGitRoot(current)
+
+		BakiBakiRootPath, err := lib.FindBakiBakiRoot(current)
 		if err != nil {
 			fmt.Println(err)
 		}
 		client := lib.Client{
-			Root: GitRootPath,
+			Root: BakiBakiRootPath,
+		}
+		index_path := client.GetIndexPath()
+		fmt.Println(index_path)
+
+		index, err := client.GetIndexObject(index_path)
+		if err != nil {
+			fmt.Println(err)
 		}
 
-		// indexファイルをオブジェクトとして取得
-		indexPath := client.GetIndexPath()
-		fmt.Println(indexPath)
-		// index, err := lib.GetIndexObject(indexPath)
-		// if err != nil {
-		// 	fmt.Println(err)
-		// }
-		// // util.CreateTree(index)
-		// fmt.Println(index)
+		for _, entry := range index.Entries {
+			fmt.Println("index:", entry.Name, entry.Hash)
+		}
 	},
 }
 

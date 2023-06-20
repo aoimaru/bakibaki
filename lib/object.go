@@ -88,10 +88,6 @@ func (c *Commit) Format() {
 	fmt.Println("Message  :", c.Message)
 }
 
-type Client_v2 struct {
-	Root string
-}
-
 func hash2Path(hash string) (string, error) {
 	if len(hash) <= LENGTH_OF_HASH {
 		return "", errors.New("Invalid Hash")
@@ -185,11 +181,6 @@ func (c *Client) GetGitObject(hash string) ([]byte, error) {
 		return nil, err
 	}
 	return extracted_buffer, nil
-}
-
-func (c *Client_v2) GetIndexPath() string {
-	indexPath := "/index"
-	return c.Root + indexPath
 }
 
 func Create3TObject(lineMeta string) string {
