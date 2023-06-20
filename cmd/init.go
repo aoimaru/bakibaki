@@ -6,7 +6,9 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/aoimaru/bakibaki/lib"
 	"github.com/spf13/cobra"
 )
 
@@ -22,6 +24,24 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("init called")
+		current, _ := os.Getwd()
+
+		// BakiBakiクライアントを作成
+		GitRootPath, err := lib.FindBakiBakiRoot(current)
+		if err != nil {
+			fmt.Println(err)
+		}
+		client := lib.Client{
+			Root: GitRootPath,
+		}
+
+		// indexファイルのファイルパスを取得
+		index_path := client.GetIndexPath()
+
+		// indexファイルが存在しない場合は, エントリーが空のindexファイルを作成する
+		index := lib.InitIndexObject()
+		index_buffer := index.AsByte()
+		index_buffer.ToFile(index_path)
 	},
 }
 
