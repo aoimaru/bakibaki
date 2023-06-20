@@ -42,15 +42,13 @@ to quickly create a Cobra application.`,
 		client := lib.Client{
 			Root: GitRootPath,
 		}
-		GObuffer, err := client.GetGitObject(hash)
+		buffer, err := client.GetGitObject(hash)
 		if err != nil {
-			fmt.Println("ERROR:1")
 			fmt.Println(err)
 		}
-		Header, Content, err := lib.Header3Content(&GObuffer)
+		Header, Content, err := lib.Header3Content(&buffer)
 		fmt.Println("Header:", Header)
 		if err != nil {
-			fmt.Println("ERROR:2")
 			fmt.Println(err)
 		}
 

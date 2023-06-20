@@ -8,7 +8,18 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
+
+type Blob struct {
+	Size    int
+	Content []byte
+}
+
+func (b *Blob) Format() {
+	fmt.Printf("Object-Type: Blob Size: %d\n", b.Size)
+	fmt.Println(string(b.Content))
+}
 
 func (c *Client) CreateBlobFile(file_path string) ([]byte, string, error) {
 	f, err := os.Open(file_path)
@@ -69,4 +80,37 @@ func (c *Client) CreateBlobFile(file_path string) ([]byte, string, error) {
 
 	return compressed_buffer, hash, nil
 
+}
+
+func (c *Client) CreateBlobObject(buffer []byte) (Blob, error) {
+	datas := make([][]byte, 0)
+	data := make([]byte, 0)
+
+	for _, buf := range buffer {
+		if buf == 0 {
+			if len(data) <= 1 {
+				continue
+			}
+			datas = append(datas, data)
+			data = make([]byte, 0)
+		}
+	}
+
+	content := make([]byte, 0)
+	for _, data := range datas[1:] {
+		content = append(content, data...)
+	}
+	header := datas[0]
+	fmt.Println(header)
+
+	size, err := strconv.Atoi(strings.Replace(string(header), "blob ", "", -1))
+	if err != nil {
+		return Blob{}, err
+	}
+	blob := Blob{
+		Size:    size,
+		Content: content,
+	}
+
+	return blob, nil
 }

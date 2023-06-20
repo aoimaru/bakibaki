@@ -37,7 +37,7 @@ to quickly create a Cobra application.`,
 			Root: GitRootPath,
 		}
 		indexPath := client.GetIndexPath()
-		index, _ := lib.GetIndexObject(indexPath)
+		index, _ := client.GetIndexObject(indexPath)
 		// _, _ = lib.GetIndexObject(indexPath)
 
 		// for _, entry := range (*index).Entries {
@@ -105,7 +105,7 @@ to quickly create a Cobra application.`,
 		buffer = append(buffer, version...)
 		buffer = append(buffer, number...)
 
-		for _, entry := range (*index).Entries[:100] {
+		for _, entry := range index.Entries[:100] {
 
 			fmt.Println(entry)
 

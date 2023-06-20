@@ -9,7 +9,6 @@ import (
 	"os"
 
 	"github.com/aoimaru/bakibaki/lib"
-	"github.com/aoimaru/bakibaki/util"
 	"github.com/spf13/cobra"
 )
 
@@ -37,11 +36,13 @@ to quickly create a Cobra application.`,
 
 		// indexファイルをオブジェクトとして取得
 		indexPath := client.GetIndexPath()
-		index, err := lib.GetIndexObject(indexPath)
-		if err != nil {
-			fmt.Println(err)
-		}
-		util.CreateTree(index)
+		fmt.Println(indexPath)
+		// index, err := lib.GetIndexObject(indexPath)
+		// if err != nil {
+		// 	fmt.Println(err)
+		// }
+		// // util.CreateTree(index)
+		// fmt.Println(index)
 	},
 }
 

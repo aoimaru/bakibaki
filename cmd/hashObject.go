@@ -5,11 +5,12 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
 	"errors"
-	"github.com/spf13/cobra"
-	"github.com/aoimaru/bakibaki/lib"
+	"fmt"
 	"os"
+
+	"github.com/aoimaru/bakibaki/lib"
+	"github.com/spf13/cobra"
 )
 
 const (
@@ -28,13 +29,13 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		current, _ := os.Getwd()
-		GitRootPath, err := lib.FindBakiBakiRoot(current)
+		BakiBakiRootPath, err := lib.FindBakiBakiRoot(current)
 		if err != nil {
 			fmt.Println(err)
 		}
-		
+
 		client := lib.Client{
-			Root: GitRootPath,
+			Root: BakiBakiRootPath,
 		}
 		path := args[0]
 		buffer, hash, err := client.CreateBlobFile(path)

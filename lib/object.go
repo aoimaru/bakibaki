@@ -30,18 +30,12 @@ var (
 	signRegexp            = regexp.MustCompile("^[^<]* <" + emailRegexpString + "> " + timestampRegexpString + "$")
 )
 
+type GitBuffer struct {
+	Buffer []byte
+}
+
 type GitObject interface {
 	Format()
-}
-
-type Blob struct {
-	Size    int
-	Content []byte
-}
-
-func (b *Blob) Format() {
-	fmt.Printf("Object-Type: Blob Size: %d\n", b.Size)
-	fmt.Println(string(b.Content))
 }
 
 type Column struct {
@@ -161,35 +155,39 @@ func Header3Content(buffer *[]byte) ([]byte, []byte, error) {
 }
 
 func (c *Client) GetGitObject(hash string) ([]byte, error) {
-	hash_rel_path, err := hash2Path(hash)
-	if err != nil {
-		return nil, err
-	}
+	hash_rel_path := "/objects/" + hash[:2] + "/" + hash[2:]
+
 	object_abs_path := c.Root + hash_rel_path
 	f, err := os.Open(object_abs_path)
 	if err != nil {
-		fmt.Println(err)
-		return nil, errors.New("where??")
+		return nil, err
 	}
 	defer f.Close()
 
-	buffer := file2Buffer(f)
+	buffer := make([]byte, 0)
+	buf := make([]byte, 64)
+	for {
+		n, _ := (*f).Read(buf)
+		if n == 0 {
+			break
+		}
+		buffer = append(buffer, buf...)
+	}
 
-	Ebuffer := bytes.NewBuffer(buffer)
-
-	Zf, err := extract(Ebuffer)
+	extracting_buffer := bytes.NewBuffer(buffer)
+	zlib_reader, err := zlib.NewReader(extracting_buffer)
 	if err != nil {
 		return nil, err
 	}
 
-	Zbuffer, err := ioutil.ReadAll(Zf)
+	extracted_buffer, err := ioutil.ReadAll(zlib_reader)
 	if err != nil {
 		return nil, err
 	}
-	return Zbuffer, nil
+	return extracted_buffer, nil
 }
 
-func (c *Client) GetIndexPath() string {
+func (c *Client_v2) GetIndexPath() string {
 	indexPath := "/index"
 	return c.Root + indexPath
 }
