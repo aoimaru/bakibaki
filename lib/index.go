@@ -96,6 +96,7 @@ func GetPaddingSize(had uint64) uint64 {
 }
 
 func (c *Client) GetIndexObject(file_path string) (Index, error) {
+	// fmt.Println("---> Call GetIndexObject")
 	f, err := os.Open(file_path)
 	if err != nil {
 		return Index{}, err
@@ -126,6 +127,8 @@ func (c *Client) GetIndexObject(file_path string) (Index, error) {
 	index.Dirc = dirc
 	index.Version = version
 	index.Number = number_of_entry
+
+	fmt.Printf("%+v\n", index)
 
 	var count uint32
 	count = 0
@@ -158,6 +161,7 @@ func (c *Client) GetIndexObject(file_path string) (Index, error) {
 		inode := Bytes2Uint32(buffer[20:24])
 		mode, err := Byte2Mode(buffer[24:28])
 		if err != nil {
+			// fmt.Println("Byte2Mode")
 			continue
 		}
 		uid := Bytes2Uint32(buffer[28:32])
@@ -182,12 +186,14 @@ func (c *Client) GetIndexObject(file_path string) (Index, error) {
 			Name:  name,
 		}
 
+		// fmt.Println("entry-->", entry)
 		index.Entries = append(index.Entries, entry)
 
 		padding := GetPaddingSize(62 + nsize)
 		offset := 62 + nsize + padding
 		buffer = buffer[offset:]
 	}
+	fmt.Printf("new: %+v\n", index)
 	return index, nil
 }
 
@@ -218,6 +224,7 @@ func (index *Index) UpdateIndex(name string, hash string) Index {
 		fmt.Println(err)
 	}
 	mode := uint32(mode_number)
+	// fmt.Println("mode:", mode, reflect.TypeOf(mode))
 
 	new_entry := Entry{
 		CTime: file_info.ModTime(),

@@ -24,10 +24,22 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("init called")
-		current, _ := os.Getwd()
+		current_dir, _ := os.Getwd()
+
+		if _, err := os.Stat(current_dir + "/.bakibaki"); err == nil {
+			fmt.Println(current_dir + "/.bakibaki")
+			_ = os.RemoveAll(current_dir + "/.bakibaki")
+		}
+
+		if err := os.MkdirAll(current_dir+"/.bakibaki/objects", 1755); err != nil {
+			fmt.Println(err)
+		}
+		if err := os.MkdirAll(current_dir+"/.bakibaki/refs/heads", 1755); err != nil {
+			fmt.Println(err)
+		}
 
 		// BakiBakiクライアントを作成
-		GitRootPath, err := lib.FindBakiBakiRoot(current)
+		GitRootPath, err := lib.FindBakiBakiRoot(current_dir)
 		if err != nil {
 			fmt.Println(err)
 		}

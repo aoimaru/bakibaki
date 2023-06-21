@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"errors"
-	"strings"
 
 	"github.com/aoimaru/bakibaki/lib"
 )
@@ -46,32 +45,33 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			fmt.Println(err)
 		}
-		Header, Content, err := lib.Header3Content(&buffer)
-		fmt.Println("Header:", Header)
-		if err != nil {
-			fmt.Println(err)
-		}
+		fmt.Println(string(buffer))
+		// Header, Content, err := lib.Header3Content(&buffer)
+		// fmt.Println("Header:", Header)
+		// if err != nil {
+		// 	fmt.Println(err)
+		// }
 
-		if strings.HasPrefix(string(Header), "blob ") {
-			blob, err := lib.CreateBlobObject(Header, Content)
-			if err != nil {
-				fmt.Println(err)
-			}
-			blob.Format()
-		} else if strings.HasPrefix(string(Header), "tree ") {
-			tree, err := lib.CreateTreeObject(Header, Content)
-			if err != nil {
-				fmt.Println(err)
-			}
-			tree.Format()
-		} else if strings.HasPrefix(string(Header), "commit ") {
-			commit, err := lib.CreateCommitObject(Header, Content)
-			if err != nil {
-				fmt.Println(err)
+		// if strings.HasPrefix(string(Header), "blob ") {
+		// 	blob, err := lib.CreateBlobObject(Header, Content)
+		// 	if err != nil {
+		// 		fmt.Println(err)
+		// 	}
+		// 	blob.Format()
+		// } else if strings.HasPrefix(string(Header), "tree ") {
+		// 	tree, err := lib.CreateTreeObject(Header, Content)
+		// 	if err != nil {
+		// 		fmt.Println(err)
+		// 	}
+		// 	tree.Format()
+		// } else if strings.HasPrefix(string(Header), "commit ") {
+		// 	commit, err := lib.CreateCommitObject(Header, Content)
+		// 	if err != nil {
+		// 		fmt.Println(err)
 
-			}
-			commit.Format()
-		}
+		// 	}
+		// 	commit.Format()
+		// }
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
 		/** 引数のバリデーションを行うことができる */

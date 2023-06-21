@@ -48,7 +48,9 @@ func (node *Node) GetFileStatus(index *Index) FileStatus {
 }
 
 func (fs *FileStatus) GetType() string {
-	if _, err := os.Stat(fs.Name); err != nil {
+	current_dir, _ := os.Getwd()
+	file_path := current_dir + "/" + fs.Name
+	if _, err := os.Stat(file_path); err != nil {
 		return "blob"
 	} else {
 		return "tree"
@@ -57,6 +59,14 @@ func (fs *FileStatus) GetType() string {
 }
 
 func WriteTree(node *Node, index *Index) string {
+	if len((*node).Children) <= 0 {
+		for _, entry := range *&index.Entries {
+			if (*node).Path == entry.Name {
+				return entry.Hash
+			}
+		}
+	}
+
 	buffer := make([]byte, 0)
 	header := []byte{116, 114, 101, 101, 32, 51, 53, 51}
 	buffer = append(buffer, header...)
@@ -92,11 +102,15 @@ func WriteTree(node *Node, index *Index) string {
 
 	current_dir, _ := os.Getwd()
 	object_path := current_dir + "/.bakibaki/objects/"
-	fmt.Println(object_path, new_hash[:2], new_hash[2:])
+	// fmt.Println(object_path, new_hash[:2], new_hash[2:])
 	if _, err := os.Stat(object_path + new_hash[:2]); err != nil {
 		if err := os.MkdirAll(object_path+new_hash[:2], 1755); err != nil {
 			return ""
 		}
+	}
+
+	if _, err := os.Stat(object_path + new_hash[:2] + "/" + new_hash[2:]); err == nil {
+		return new_hash
 	}
 
 	new_writer, _ := os.Create(object_path + new_hash[:2] + "/" + new_hash[2:])

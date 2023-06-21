@@ -43,8 +43,6 @@ to quickly create a Cobra application.`,
 		for _, node := range nodes {
 			if (*node).Path == "root" {
 				root_tree_hash := lib.WriteTree(node, &index)
-				fmt.Println(root_tree_hash)
-
 				lib.CatFile(root_tree_hash)
 				break
 			}
