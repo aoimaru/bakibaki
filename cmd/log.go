@@ -7,9 +7,10 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
-	"github.com/aoimaru/bakibaki/lib"
 	"os"
+
+	"github.com/aoimaru/bakibaki/lib"
+	"github.com/spf13/cobra"
 )
 
 // logCmd represents the log command
@@ -36,7 +37,7 @@ to quickly create a Cobra application.`,
 		// latest := "52989a2e4522aef5ccabd9c7ae0ade5e70fe1c91"
 		latest := "c5c96d548128df26ea5f5d9e32b28c38133d2019"
 		fmt.Println(latest)
-		lib.WalkGitLog(client, latest)
+		// lib.WalkGitLog(client, latest)
 	},
 }
 

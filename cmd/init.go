@@ -48,12 +48,17 @@ to quickly create a Cobra application.`,
 		}
 
 		// indexファイルのファイルパスを取得
-		index_path := client.GetIndexPath()
+		// index_path := client.GetIndexPath()
 
 		// indexファイルが存在しない場合は, エントリーが空のindexファイルを作成する
 		index := lib.InitIndexObject()
 		index_buffer := index.AsByte()
-		index_buffer.ToFile(index_path)
+		index_buffer.ToFile(client)
+
+		if err = lib.CreateHEAD(); err != nil {
+			fmt.Println(err)
+		}
+
 	},
 }
 

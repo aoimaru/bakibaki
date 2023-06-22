@@ -45,7 +45,12 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			fmt.Println(err)
 		}
-		fmt.Println(string(buffer))
+		header := lib.GetGitHeader(buffer)
+		fmt.Println(header)
+
+		commit_object := lib.CreateCommitObject(buffer)
+		fmt.Println(commit_object)
+
 		// Header, Content, err := lib.Header3Content(&buffer)
 		// fmt.Println("Header:", Header)
 		// if err != nil {

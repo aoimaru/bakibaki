@@ -1,1 +1,5 @@
 package lib
+
+func GetCommitObject() {
+
+}

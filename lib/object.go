@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"regexp"
@@ -31,6 +30,14 @@ var (
 )
 
 type GitBuffer struct {
+	Buffer []byte
+}
+
+type IndexBuffer struct {
+	Buffer []byte
+}
+
+type CommitBuffer struct {
 	Buffer []byte
 }
 
@@ -88,26 +95,37 @@ func (c *Commit) Format() {
 	fmt.Println("Message  :", c.Message)
 }
 
-func hash2Path(hash string) (string, error) {
-	if len(hash) <= LENGTH_OF_HASH {
-		return "", errors.New("Invalid Hash")
-	}
-	DirPath, ObjPath := hash[:2], hash[2:]
-	hashPath := "/objects/" + DirPath + "/" + ObjPath
-	return hashPath, nil
-}
+// func hash2Path(hash string) (string, error) {
+// 	if len(hash) <= LENGTH_OF_HASH {
+// 		return "", errors.New("Invalid Hash")
+// 	}
+// 	DirPath, ObjPath := hash[:2], hash[2:]
+// 	hashPath := "/objects/" + DirPath + "/" + ObjPath
+// 	return hashPath, nil
+// }
 
-func hash2PathDir(hash string) (string, error) {
-	if len(hash) <= LENGTH_OF_HASH {
-		return "", errors.New("Invalid Hash")
-	}
-	DirPath := hash[:2]
-	hashPath := "/objects/" + DirPath
-	return hashPath, nil
-}
+// func hash2PathDir(hash string) (string, error) {
+// 	if len(hash) <= LENGTH_OF_HASH {
+// 		return "", errors.New("Invalid Hash")
+// 	}
+// 	DirPath := hash[:2]
+// 	hashPath := "/objects/" + DirPath
+// 	return hashPath, nil
+// }
 
-func extract(zr io.Reader) (io.Reader, error) {
-	return zlib.NewReader(zr)
+// func extract(zr io.Reader) (io.Reader, error) {
+// 	return zlib.NewReader(zr)
+// }
+
+func GetGitHeader(buffer []byte) string {
+	header := make([]byte, 1024)
+	for _, buf := range buffer {
+		if buf == 0 {
+			break
+		}
+		header = append(header, buf)
+	}
+	return string(header)
 }
 
 func file2Buffer(f *os.File) []byte {
@@ -225,7 +243,27 @@ func Create3ACObject(lineMeta string) (Sign, error) {
 
 }
 
-func CreateCommitObject(Header []byte, Content []byte) (Commit, error) {
+func CreateCommitObject(buffer []byte) Commit {
+	entries := make([][]byte, 0)
+	entry := make([]byte, 0)
+
+	for _, buf := range buffer {
+		if buf == 0 {
+			entries = append(entries, entry)
+			entry = make([]byte, 0)
+		}
+		entry = append(entry, buf)
+	}
+	entries = append(entries, entry)
+
+	for _, entry := range entries {
+		fmt.Println(string(entry))
+	}
+
+	return Commit{}
+}
+
+func CreateCommitObject_v2(Header []byte, Content []byte) (Commit, error) {
 	sizeStr := strings.Replace(string(Header), "commit ", "", -1)
 	size, err := strconv.Atoi(sizeStr)
 	if err != nil {

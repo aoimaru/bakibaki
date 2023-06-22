@@ -259,7 +259,7 @@ func (index *Index) UpdateIndex(name string, hash string) Index {
 	return new_index
 }
 
-func (index *Index) AsByte() GitBuffer {
+func (index *Index) AsByte() IndexBuffer {
 	buffer := make([]byte, 0)
 	dirc := []byte(index.Dirc)
 	version := Element2byte32(index.Version)
@@ -326,6 +326,6 @@ func (index *Index) AsByte() GitBuffer {
 		buffer = append(buffer, bPadding...)
 	}
 
-	return GitBuffer{Buffer: buffer}
+	return IndexBuffer{Buffer: buffer}
 
 }
