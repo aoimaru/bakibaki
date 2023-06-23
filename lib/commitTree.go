@@ -36,32 +36,34 @@ func CommitTree(message string, hash string, client Client) (string, error) {
 		if _, err := os.Stat(v.Head); err != nil {
 			err = ioutil.WriteFile(v.Head, []byte(hash), 0664)
 			if err != nil {
-				fmt.Println(err)
+				return "", err
 			}
 			fmt.Println(v.Head)
 		} else {
 			f, err := os.Open(v.Head)
 			if err != nil {
-				fmt.Println(err)
+				return "", err
 			}
 			defer f.Close()
 			buffer, err := ioutil.ReadAll(f)
 			if err != nil {
 				fmt.Println(err)
+				return "", err
 			}
 			parent_hash := string(buffer)
 			commit.Parents = append(commit.Parents, Parent{Hash: parent_hash})
-
-			commit.Format()
-			commit_buffer := commit.AsByte()
-			commit_hash, err := commit_buffer.ToFile(client)
-			fmt.Println(commit_hash)
-			return commit_hash, nil
 		}
+		commit.Format()
+		commit_buffer := commit.AsByte()
+		commit_hash, err := commit_buffer.ToFile(client)
+		if err != nil {
+			return "", err
+		}
+		fmt.Println(commit_hash)
+		return commit_hash, nil
 	default:
 		return "", err
 	}
-	return "", err
 }
 
 func (c *Commit) AsByte() CommitBuffer {
