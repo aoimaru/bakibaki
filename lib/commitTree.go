@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 )
 
 func CommitTree(message string, hash string, client Client) (string, error) {
-	ref_path, _ := GetHeadRef()
-
 	var commit Commit
 	commit.Size = 119
 	commit.Tree = hash
@@ -25,50 +24,44 @@ func CommitTree(message string, hash string, client Client) (string, error) {
 
 	commit.Message = message
 
-	if _, err := os.Stat(ref_path); err != nil {
-		write_object, err := os.Create(ref_path)
-		// write_object, err := os.Create(".bakibaki/refs/heads/master")
-		// write_object, err := os.Create("/mnt/c/Users/81701/Documents/AtCoder/.bakibaki/refs/heads/master")
-		if err != nil {
-			fmt.Println("ERROR:1", err)
-			return "", err
-		}
-		defer write_object.Close()
-
-		if _, err = write_object.Write([]byte(hash)); err != nil {
-			fmt.Println("ERROR:2", err)
-			return "", err
-		}
-	} else {
-		f, err := os.Open(ref_path)
-		// f, err := os.Open("/mnt/c/Users/81701/Documents/AtCoder/.bakibaki/refs/heads/master")
-		if err != nil {
-			fmt.Println("ERROR:3", err)
-			return "", err
-		}
-		defer f.Close()
-
-		buffer, err := ioutil.ReadAll(f)
-		if err != nil {
-			fmt.Println("ERROR:4", err)
-			return "", err
-		}
-
-		parent_hash := string(buffer)
-		commit.Parents = append(commit.Parents, Parent{Hash: parent_hash})
-
+	ref_head, err := GetHeadRef()
+	if err != nil {
+		return "", nil
 	}
 
-	commit.Format()
-	commit_buffer := commit.AsByte()
+	switch v := ref_head.(type) {
+	case DetachedHead:
+		return v.Head, nil
+	case TatchedHead:
+		if _, err := os.Stat(v.Head); err != nil {
+			err = ioutil.WriteFile(v.Head, []byte(hash), 0664)
+			if err != nil {
+				fmt.Println(err)
+			}
+			fmt.Println(v.Head)
+		} else {
+			f, err := os.Open(v.Head)
+			if err != nil {
+				fmt.Println(err)
+			}
+			defer f.Close()
+			buffer, err := ioutil.ReadAll(f)
+			if err != nil {
+				fmt.Println(err)
+			}
+			parent_hash := string(buffer)
+			commit.Parents = append(commit.Parents, Parent{Hash: parent_hash})
 
-	commit_hash, err := commit_buffer.ToFile(client)
-	if err != nil {
+			commit.Format()
+			commit_buffer := commit.AsByte()
+			commit_hash, err := commit_buffer.ToFile(client)
+			fmt.Println(commit_hash)
+			return commit_hash, nil
+		}
+	default:
 		return "", err
 	}
-
-	return commit_hash, nil
-
+	return "", err
 }
 
 func (c *Commit) AsByte() CommitBuffer {
@@ -100,38 +93,53 @@ func (c *Commit) AsByte() CommitBuffer {
 	buffer = append(buffer, []byte(c.Message)...)
 
 	return CommitBuffer{Buffer: buffer}
-
 }
 
 type Head interface {
 }
 
 type DetachedHead struct {
+	Head string
 }
 
 type TatchedHead struct {
+	Head string
 }
 
-func GetHeadRef() (string, error) {
+func GetHeadRef() (Head, error) {
 	current_dir, _ := os.Getwd()
 	f, err := os.Open(current_dir + "/.bakibaki/HEAD")
 	if err != nil {
-		return "", err
+		return DetachedHead{}, err
 	}
 	defer f.Close()
-
 	ref_buffer := make([]byte, 1024)
 	if _, err := f.Read(ref_buffer); err != nil {
 		return "", err
 	}
 	ref_string := string(ref_buffer)
-	ref_string = strings.Replace(ref_string, "\n", "", -1)
-	ref_string = strings.Replace(ref_string, "ref: ", "", 1)
-	ref_string = strings.Replace(ref_string, ":", "", 1)
-	ref_string = strings.Join(strings.Fields(ref_string), "")
-	// return current_dir + "/.bakibaki/" + ref_string, nil
-	ref_string = ".bakibaki/" + ref_string
 
-	return ref_string, nil
+	re := regexp.MustCompile(`ref: refs/heads/(\w+)`)
+
+	if re.MatchString(ref_string) {
+		ref := make([]byte, 0)
+		for _, ref_buf := range ref_buffer {
+			if ref_buf == 0 {
+				break
+			}
+			ref = append(ref, ref_buf)
+		}
+		ref_string = string(ref)
+		ref_string = strings.Replace(ref_string, "\n", "", -1)
+		ref_string = strings.Replace(ref_string, "ref: ", "", 1)
+		ref_string = strings.Replace(ref_string, ":", "", 1)
+
+		current_dir, _ := os.Getwd()
+		ref_string = current_dir + "/.bakibaki/" + ref_string
+		ref_string = strings.Join(strings.Fields(ref_string), "")
+		return TatchedHead{Head: ref_string}, nil
+	} else {
+		return DetachedHead{Head: ref_string}, nil
+	}
 
 }
