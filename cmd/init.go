@@ -31,10 +31,17 @@ to quickly create a Cobra application.`,
 			_ = os.RemoveAll(current_dir + "/.bakibaki")
 		}
 
-		if err := os.MkdirAll(current_dir+"/.bakibaki/objects", 1755); err != nil {
+		if err := os.MkdirAll(current_dir+"/.bakibaki", os.ModePerm); err != nil {
 			fmt.Println(err)
 		}
-		if err := os.MkdirAll(current_dir+"/.bakibaki/refs/heads", 1755); err != nil {
+
+		if err := os.MkdirAll(current_dir+"/.bakibaki/objects", os.ModePerm); err != nil {
+			fmt.Println(err)
+		}
+		if err := os.MkdirAll(current_dir+"/.bakibaki/refs", os.ModePerm); err != nil {
+			fmt.Println(err)
+		}
+		if err := os.MkdirAll(current_dir+"/.bakibaki/refs/heads", os.ModePerm); err != nil {
 			fmt.Println(err)
 		}
 

@@ -26,8 +26,9 @@ func CommitTree(message string, hash string, client Client) (string, error) {
 	commit.Message = message
 
 	if _, err := os.Stat(ref_path); err != nil {
-		// write_object, err := os.Create(ref_path)
-		write_object, err := os.Create("/mnt/c/Users/81701/Documents/AtCoder/.bakibaki/refs/heads/master")
+		write_object, err := os.Create(ref_path)
+		// write_object, err := os.Create(".bakibaki/refs/heads/master")
+		// write_object, err := os.Create("/mnt/c/Users/81701/Documents/AtCoder/.bakibaki/refs/heads/master")
 		if err != nil {
 			fmt.Println("ERROR:1", err)
 			return "", err
@@ -39,8 +40,8 @@ func CommitTree(message string, hash string, client Client) (string, error) {
 			return "", err
 		}
 	} else {
-		// f, err := os.Open(ref_path)
-		f, err := os.Open("/mnt/c/Users/81701/Documents/AtCoder/.bakibaki/refs/heads/master")
+		f, err := os.Open(ref_path)
+		// f, err := os.Open("/mnt/c/Users/81701/Documents/AtCoder/.bakibaki/refs/heads/master")
 		if err != nil {
 			fmt.Println("ERROR:3", err)
 			return "", err
@@ -102,6 +103,15 @@ func (c *Commit) AsByte() CommitBuffer {
 
 }
 
+type Head interface {
+}
+
+type DetachedHead struct {
+}
+
+type TatchedHead struct {
+}
+
 func GetHeadRef() (string, error) {
 	current_dir, _ := os.Getwd()
 	f, err := os.Open(current_dir + "/.bakibaki/HEAD")
@@ -117,7 +127,11 @@ func GetHeadRef() (string, error) {
 	ref_string := string(ref_buffer)
 	ref_string = strings.Replace(ref_string, "\n", "", -1)
 	ref_string = strings.Replace(ref_string, "ref: ", "", 1)
+	ref_string = strings.Replace(ref_string, ":", "", 1)
+	ref_string = strings.Join(strings.Fields(ref_string), "")
+	// return current_dir + "/.bakibaki/" + ref_string, nil
+	ref_string = ".bakibaki/" + ref_string
 
-	return current_dir + "/.bakibaki/" + ref_string, nil
+	return ref_string, nil
 
 }
