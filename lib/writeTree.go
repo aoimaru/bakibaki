@@ -43,17 +43,27 @@ func (node *Node) GetFileStatus(index *Index) FileStatus {
 		file_status.Size = uint32(fi.Size())
 		file_status.Mode = uint32(fi.Mode())
 	}
-
+	fmt.Printf("file_status: %+v\n", file_status)
 	return file_status
 }
 
 func (fs *FileStatus) GetType() string {
 	current_dir, _ := os.Getwd()
 	file_path := current_dir + "/" + fs.Name
-	if _, err := os.Stat(file_path); err != nil {
-		return "blob"
-	} else {
+	file_buffer := make([]byte, 0)
+	for _, file_buf := range []byte(file_path) {
+		if file_buf == 0 {
+			break
+		}
+		file_buffer = append(file_buffer, file_buf)
+	}
+
+	fmt.Println(string(file_buffer))
+
+	if f, err := os.Stat(string(file_buffer)); os.IsNotExist(err) || f.IsDir() {
 		return "tree"
+	} else {
+		return "blob"
 	}
 
 }
@@ -76,11 +86,11 @@ func WriteTree(node *Node, index *Index) string {
 		entry_buffer := make([]byte, 0)
 		entry_buffer = append(entry_buffer, 0)
 		if file_status.GetType() == "blob" {
-			entry_buffer = append(entry_buffer, []byte("100644"+" ")...)
+			entry_buffer = append(entry_buffer, []byte("blob"+" ")...)
 			entry_buffer = append(entry_buffer, []byte(file_status.Name+" ")...)
 			entry_buffer = append(entry_buffer, []byte(file_status.Hash)...)
 		} else {
-			entry_buffer = append(entry_buffer, []byte("40000"+" ")...)
+			entry_buffer = append(entry_buffer, []byte("tree"+" ")...)
 			entry_buffer = append(entry_buffer, []byte(file_status.Name+" ")...)
 			child_hash := WriteTree(child_node, index)
 			entry_buffer = append(entry_buffer, []byte(child_hash)...)
