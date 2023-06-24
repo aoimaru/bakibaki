@@ -5,7 +5,12 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"errors"
+	"fmt"
+	"os"
+
 	"github.com/aoimaru/bakibaki/lib"
+	"github.com/aoimaru/bakibaki/util"
 	"github.com/spf13/cobra"
 	// "github.com/aoimaru/bakibaki/test"
 )
@@ -21,8 +26,53 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		lib.Test()
+		current_dir, _ := os.Getwd()
+		BakiBakiRootPath, err := lib.FindBakiBakiRoot(current_dir)
+		if err != nil {
+			fmt.Println(err)
+		}
 
+		client := lib.Client{
+			Root: BakiBakiRootPath,
+		}
+		fmt.Println(client)
+		root_dir := current_dir + "/" + args[0]
+		if args[0] == "." {
+			root_dir = current_dir
+		}
+
+		working_file_paths, err := util.WalkingDir(root_dir)
+		if err != nil {
+			fmt.Println(err)
+		}
+		// indexファイルをオブジェクトとして取得
+		index_path := client.GetIndexPath()
+		index, err := client.GetIndexObject(index_path)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		for _, working_file_path := range working_file_paths {
+			fmt.Println("working:", working_file_path)
+			buffer, hash, err := client.CreateBlobFile(working_file_path)
+			if err != nil {
+				fmt.Println(err)
+			}
+			fmt.Println(string(buffer), hash)
+			index = index.UpdateIndex(working_file_path, hash)
+		}
+		index_buffer := index.AsByte()
+		if err := index_buffer.ToFile(client); err != nil {
+			fmt.Println(err)
+		}
+
+	},
+	Args: func(cmd *cobra.Command, args []string) error {
+		/** 引数のバリデーションを行うことができる */
+		if len(args) < 1 {
+			return errors.New("requires args")
+		}
+		return nil
 	},
 }
 
