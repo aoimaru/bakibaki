@@ -5,9 +5,24 @@ import (
 	"os"
 )
 
-func (c *Client) UpdateRef(head string, hash string) error {
-	current_dir, _ := os.Getwd()
-	head_path := current_dir + "/.bakibaki/" + head
+func (c *Client) UpdateRef(head Head, hash string) error {
+	// current_dir, _ := os.Getwd()
+	var head_path string
+	switch v := head.(type) {
+	case DetachedHead:
+		head_path = "/.bakibaki/HEAD"
+	case TatchedHead:
+		head_path = v.Head
+	}
+	head_buffer := make([]byte, 0)
+	for _, head_buf := range []byte(head_path) {
+		if head_buf == 0 {
+			break
+		}
+		head_buffer = append(head_buffer, head_buf)
+	}
+	head_path = string(head_buffer)
+
 	if _, err := os.Stat(head_path); err != nil {
 		return err
 	}

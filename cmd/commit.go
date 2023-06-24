@@ -59,7 +59,11 @@ to quickly create a Cobra application.`,
 					fmt.Println(err)
 				}
 				fmt.Println("commit hash:", commit_hash)
-				head := "refs/heads/master"
+				// head := "refs/heads/master"
+				head, err := lib.GetHeadRef()
+				if err != nil {
+					fmt.Println(err)
+				}
 				err = client.UpdateRef(head, commit_hash)
 				if err != nil {
 					fmt.Println(err)
