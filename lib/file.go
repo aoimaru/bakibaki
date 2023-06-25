@@ -54,7 +54,7 @@ func (cf *CommitBuffer) ToFile(client Client) (string, error) {
 	object_path := current_dir + "/.bakibaki/objects/"
 
 	if _, err := os.Stat(object_path + new_hash[:2]); err != nil {
-		if err := os.MkdirAll(object_path+new_hash[:2], 1755); err != nil {
+		if err := os.MkdirAll(object_path+new_hash[:2], os.ModePerm); err != nil {
 			return "", err
 		}
 	}

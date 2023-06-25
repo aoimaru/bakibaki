@@ -60,7 +60,7 @@ func (c *Client) CreateBlobFile(file_path string) ([]byte, string, error) {
 	hash_rel_path := "/objects/" + hash[:2] + "/" + hash[2:]
 
 	if _, err := os.Stat(c.Root + hash_rel_dir); err != nil {
-		if err := os.MkdirAll(c.Root+hash_rel_dir, 1755); err != nil {
+		if err := os.MkdirAll(c.Root+hash_rel_dir, os.ModePerm); err != nil {
 			return nil, "", err
 		}
 	}

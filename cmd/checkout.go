@@ -33,8 +33,27 @@ to quickly create a Cobra application.`,
 		client := lib.Client{
 			Root: GitRootPath,
 		}
-		hash := client.GetHeadHash()
-		fmt.Println(hash)
+		head_hash, err := client.GetHeadHash()
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(head_hash)
+
+		new_branch, err := cmd.Flags().GetString("branch")
+		if err != nil {
+			fmt.Println(err)
+		}
+		if new_branch != "" {
+			err := client.CreateBranch(new_branch, head_hash)
+			if err != nil {
+				fmt.Println(err)
+			}
+		} else {
+			branch := args[0]
+			checkout, _ := client.CreateCheckoutObject(branch, current)
+			fmt.Printf("%+v\n", checkout)
+			checkout.RollBackIndex(&client)
+		}
 	},
 }
 
@@ -50,7 +69,7 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// checkoutCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	checkoutCmd.Flags().StringP("create", "c", "", "create new branch")
+	// checkoutCmd.Flags().StringP("create", "c", "", "create new branch")
 	checkoutCmd.Flags().StringP("branch", "b", "", "set branch")
 
 }

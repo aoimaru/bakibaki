@@ -114,7 +114,7 @@ func WriteTree(node *Node, index *Index) string {
 	object_path := current_dir + "/.bakibaki/objects/"
 	// fmt.Println(object_path, new_hash[:2], new_hash[2:])
 	if _, err := os.Stat(object_path + new_hash[:2]); err != nil {
-		if err := os.MkdirAll(object_path+new_hash[:2], 1755); err != nil {
+		if err := os.MkdirAll(object_path+new_hash[:2], os.ModePerm); err != nil {
 			return ""
 		}
 	}

@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -39,4 +40,33 @@ func WalkingDir(root string) ([]string, error) {
 		return nil, err
 	}
 	return paths, nil
+}
+
+func GetBrabches(root string) ([]string, error) {
+	if _, err := os.Stat(root); err != nil {
+		fmt.Println(err)
+	}
+	branches := make([]string, 0)
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		rel_path, err := filepath.Rel(root, path)
+		if rel_path != "." {
+			fmt.Println("rel_path:", rel_path)
+			branches = append(branches, rel_path)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return branches, nil
+}
+
+func PaddingZeroBuffer(tag string) string {
+	buffer := make([]byte, 0)
+	for _, buf := range []byte(tag) {
+		if buf != 0 {
+			buffer = append(buffer, buf)
+		}
+	}
+	return string(buffer)
 }
