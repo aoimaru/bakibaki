@@ -7,6 +7,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"regexp"
 
 	"github.com/aoimaru/bakibaki/lib"
 	"github.com/spf13/cobra"
@@ -53,9 +54,20 @@ to quickly create a Cobra application.`,
 			Root: BakiBakiRootPath,
 		}
 
-		err = client.UpdateRef(head, hash)
-		if err != nil {
-			fmt.Println(err)
+		re := regexp.MustCompile(`refs/heads/(\w+)`)
+
+		if re.MatchString(head) {
+			tatched_head := lib.TatchedHead{Head: current + "/.bakibaki/" + head}
+			err = client.UpdateRef(tatched_head, hash)
+			if err != nil {
+				fmt.Println(err)
+			}
+		} else {
+			detatched_head := lib.DetachedHead{Head: head}
+			err = client.UpdateRef(detatched_head, hash)
+			if err != nil {
+				fmt.Println(err)
+			}
 		}
 
 		// current_dir, _ := os.Getwd()
