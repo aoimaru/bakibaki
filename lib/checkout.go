@@ -132,5 +132,6 @@ func (co *Checkout) RollBackIndex(client *Client) {
 	fmt.Println(string(buffer))
 	tree_hash, _ := client.GetCommitTreeHash(buffer)
 	fmt.Println(tree_hash)
+	_ = client.GetTreeObject(tree_hash)
 
 }

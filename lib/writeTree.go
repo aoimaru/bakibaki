@@ -8,65 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strings"
 )
-
-type Node struct {
-	Path     string
-	Children []*Node
-}
-
-type FileStatus struct {
-	Name string
-	Hash string
-	Size uint32
-	Mode uint32
-}
-
-func (node *Node) GetFileStatus(index *Index) FileStatus {
-	current_dir, _ := os.Getwd()
-	abs_path := strings.Replace(node.Path, "root", current_dir, 1)
-	name := strings.Replace(node.Path, "root/", "", 1)
-	var file_status FileStatus
-	file_status.Name = name
-	for _, entry := range index.Entries {
-		if entry.Name == name {
-			file_status.Hash = entry.Hash
-			break
-		}
-	}
-
-	f, _ := os.Open(abs_path)
-	defer f.Close()
-
-	if fi, err := f.Stat(); err == nil {
-		file_status.Size = uint32(fi.Size())
-		file_status.Mode = uint32(fi.Mode())
-	}
-	fmt.Printf("file_status: %+v\n", file_status)
-	return file_status
-}
-
-func (fs *FileStatus) GetType() string {
-	current_dir, _ := os.Getwd()
-	file_path := current_dir + "/" + fs.Name
-	file_buffer := make([]byte, 0)
-	for _, file_buf := range []byte(file_path) {
-		if file_buf == 0 {
-			break
-		}
-		file_buffer = append(file_buffer, file_buf)
-	}
-
-	fmt.Println(string(file_buffer))
-
-	if f, err := os.Stat(string(file_buffer)); os.IsNotExist(err) || f.IsDir() {
-		return "tree"
-	} else {
-		return "blob"
-	}
-
-}
 
 func WriteTree(node *Node, index *Index) string {
 	if len((*node).Children) <= 0 {
@@ -133,57 +75,6 @@ func WriteTree(node *Node, index *Index) string {
 	fmt.Printf("write %d bytes\n", count)
 
 	return new_hash
-}
-
-func GetParentName(tree *Node) string {
-	tmp := strings.Split((*tree).Path, "/")
-	return strings.Join(tmp[:len(tmp)-1], "/")
-}
-
-func (index *Index) CreateNodes() []*Node {
-	var names []string
-
-	current_dir, _ := os.Getwd()
-	for _, entry := range index.Entries {
-		file_path := current_dir + "/" + entry.Name
-		if _, err := os.Stat(file_path); err != nil {
-			continue
-		}
-
-		tmp := "root/" + entry.Name
-		namespaces := strings.Split(tmp, "/")
-		for i := 0; i <= len(namespaces); i++ {
-			new_name := strings.Join(namespaces[:i], "/")
-			flag := true
-			for _, name := range names {
-				if name == new_name {
-					flag = false
-					break
-				}
-			}
-			if flag {
-				names = append(names, new_name)
-			}
-		}
-	}
-	var nodes []*Node
-	for _, name := range names {
-		var node Node
-		node.Path = name
-		nodes = append(nodes, &node)
-	}
-
-	for _, node := range nodes {
-		parent_path := GetParentName(node)
-
-		for _, parent_node := range nodes {
-			if (*parent_node).Path == parent_path {
-				(*parent_node).Children = append((*parent_node).Children, node)
-			}
-		}
-	}
-
-	return nodes
 }
 
 func CatFile(hash string) {

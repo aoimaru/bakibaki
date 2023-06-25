@@ -45,24 +45,6 @@ type GitObject interface {
 	Format()
 }
 
-type Column struct {
-	Type string
-	Name string
-	Hash string
-}
-
-type Tree struct {
-	Size    int
-	Columns []Column
-}
-
-func (t *Tree) Format() {
-	fmt.Printf("Object-Type: Tree  Size: %d\n", t.Size)
-	for _, column := range t.Columns {
-		fmt.Printf("%s %s %s\n", column.Type, column.Name, column.Hash)
-	}
-}
-
 type Parent struct {
 	Hash string
 }
