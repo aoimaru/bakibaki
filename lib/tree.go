@@ -3,7 +3,9 @@ package lib
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
+	"syscall"
 )
 
 type Node struct {
@@ -199,9 +201,48 @@ func WalkingTree(client Client, hash string, blob_columns []Column) []Column {
 	return blob_columns
 }
 
+func CreateEntryFromBlob(column Column) (Entry, error) {
+	current_dir, _ := os.Getwd()
+	file_path := current_dir + "/" + column.Name
+	var system_call syscall.Stat_t
+	syscall.Stat(file_path, &system_call)
+
+	file_info, err := os.Stat(file_path)
+	if err != nil {
+		return Entry{}, err
+	}
+
+	oct := fmt.Sprintf("%o", uint32(system_call.Mode))
+	mode_number, err := strconv.ParseUint(oct, 10, 32)
+	if err != nil {
+		return Entry{}, err
+	}
+	mode := uint32(mode_number)
+
+	entry := Entry{
+		CTime: file_info.ModTime(),
+		MTime: file_info.ModTime(),
+		Dev:   uint32(system_call.Dev),
+		Inode: uint32(system_call.Ino),
+		Mode:  mode,
+		Uid:   system_call.Uid,
+		Gid:   system_call.Gid,
+		Size:  uint32(system_call.Size),
+		Hash:  column.Hash,
+		Name:  column.Name,
+	}
+
+	return entry, nil
+}
+
 func (c *Client) UpdateIndexFromCommit(blob_columns []Column) {
 	for _, blob_column := range blob_columns {
-		fmt.Printf("entry:%+v\n", blob_column)
+		entry, err := CreateEntryFromBlob(blob_column)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		fmt.Printf("%+v\n", entry)
 	}
 }
 
