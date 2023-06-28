@@ -3,6 +3,7 @@ package lib
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall"
@@ -235,17 +236,91 @@ func CreateEntryFromBlob(column Column) (Entry, error) {
 	return entry, nil
 }
 
-func (c *Client) UpdateIndexFromCommit(blob_columns []Column) {
+func (c *Client) CreateFileFromBlob(column Column) error {
+	current_dir, _ := os.Getwd()
+	file_path := current_dir + "/" + column.Name
+	buffer, err := c.GetGitObject(column.Hash)
+	if err != nil {
+		return err
+	}
+	f, err := os.Create(file_path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	contexts := make([][]byte, 0)
+	context := make([]byte, 0)
+	for _, buf := range buffer {
+		if buf == 0 {
+			contexts = append(contexts, context)
+			context = make([]byte, 0)
+		}
+		context = append(context, buf)
+	}
+	contexts = append(contexts, context)
+
+	output := make([]byte, 0)
+	for _, context := range contexts[1:] {
+		output = append(output, context...)
+	}
+
+	if _, err = f.Write(output[1:]); err != nil {
+		fmt.Println("ERROR:2", err)
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) RmFileFromCommit(blob_columns []Column) {
+	current_dir, _ := os.Getwd()
+	err := filepath.Walk(current_dir, func(path string, info os.FileInfo, err error) error {
+		rel_path, _ := filepath.Rel(current_dir, path)
+		if !strings.HasPrefix(rel_path, ".") {
+			if !info.IsDir() {
+				flag := true
+				for _, blob_column := range blob_columns {
+					if rel_path == blob_column.Name {
+						flag = false
+						break
+					}
+				}
+				if flag {
+					os.Remove(current_dir + "/" + rel_path)
+				}
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		fmt.Println(err)
+	}
+
+}
+
+func (c *Client) UpdateIndexFromCommit(blob_columns []Column) Index {
+	var index Index
 	for _, blob_column := range blob_columns {
 		entry, err := CreateEntryFromBlob(blob_column)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
-		fmt.Printf("%+v\n", entry)
+		index.Entries = append(index.Entries, entry)
 	}
+	index.Dirc = "DIRC"
+	index.Version = 2
+	index.Number = uint32(len(index.Entries))
+	return index
 }
 
-func (c *Client) UpdateFileFromCommit() {
-
+func (c *Client) UpdateFileFromCommit(blob_columns []Column) {
+	for _, blob_column := range blob_columns {
+		fmt.Printf("%+v\n", blob_column)
+		err := c.CreateFileFromBlob(blob_column)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
 }

@@ -41,7 +41,7 @@ to quickly create a Cobra application.`,
 		}
 
 		for _, entry := range index.Entries {
-			fmt.Println("index:", entry.Name, entry.Hash)
+			fmt.Println("index:", entry.Name, entry.Hash, entry.MTime)
 		}
 	},
 }

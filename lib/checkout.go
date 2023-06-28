@@ -166,5 +166,15 @@ func (co *Checkout) RollBackIndex(client *Client) {
 	// fmt.Println(tree_hash)
 	_ = client.GetTreeObject(tree_hash)
 	blob_columns := WalkingTree(*client, tree_hash, make([]Column, 0))
-	client.UpdateIndexFromCommit(blob_columns)
+	index := client.UpdateIndexFromCommit(blob_columns)
+	fmt.Printf("%+v\n", index)
+	index_buffer := index.AsByte()
+	if err := index_buffer.ToFile(*client); err != nil {
+		fmt.Println(err)
+	}
+	client.UpdateFileFromCommit(blob_columns)
+
+	fmt.Println()
+	fmt.Println()
+	client.RmFileFromCommit(blob_columns)
 }
