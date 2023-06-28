@@ -201,7 +201,7 @@ func WalkingTree(client Client, hash string, blob_columns []Column) []Column {
 
 func (c *Client) UpdateIndexFromCommit(blob_columns []Column) {
 	for _, blob_column := range blob_columns {
-		fmt.Printf("%+v\n", blob_column)
+		fmt.Printf("entry:%+v\n", blob_column)
 	}
 }
 
