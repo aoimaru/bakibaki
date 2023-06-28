@@ -1,6 +1,15 @@
 # BAKIBAKI
 Gitのクローンアプリ
 
+## 実装済みのコマンド
++ init
++ add (hashObject, update-index)
++ commit (write-tree, commit-tree, update-ref)
++ cat-file
++ checkout
++ log
++ ls-files
+
 ## ディレクトリ構成
 ### cmd
 実際のコマンドを格納
