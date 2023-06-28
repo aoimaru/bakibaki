@@ -51,8 +51,10 @@ to quickly create a Cobra application.`,
 		} else {
 			branch := args[0]
 			checkout, _ := client.CreateCheckoutObject(branch, current)
-			fmt.Printf("%+v\n", checkout)
 			checkout.RollBackIndex(&client)
+			fmt.Printf("%+v\n", checkout)
+			_ = client.UpdateHead(branch)
+
 		}
 	},
 }

@@ -94,11 +94,42 @@ type Checkout struct {
 
 func (c *Client) GetCommitHashFromName(branch_name string) (string, error) {
 	branch_path := c.Root + "/refs/heads/" + branch_name
-	buffer, err := os.ReadFile(branch_path)
+	// buffer, err := os.ReadFile(branch_path)
+	// if err != nil {
+	// 	return "", err
+	// }
+	f, err := os.Open(branch_path)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+	buffer, err := ioutil.ReadAll(f)
 	if err != nil {
 		return "", err
 	}
 	return string(buffer), nil
+}
+
+func (c *Client) UpdateHead(branch string) error {
+	head_path := c.Root + "/HEAD"
+	// 書き込み権限がなかったためのバグ
+	head_f, err := os.Create(head_path)
+	if err != nil {
+		fmt.Println("ERROR:1", err)
+		return err
+	}
+	defer head_f.Close()
+	// ここはあとで修正する必要あり, detatched_headへの対応
+	if _, err = head_f.Write([]byte("ref: refs/heads/" + branch)); err != nil {
+		fmt.Println("ERROR:2", err)
+		return err
+	}
+	// _, err = head_f.WriteString("ref: refs/heads/" + branch)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return err
+	// }
+	return nil
 }
 
 func (c *Client) CreateCheckoutObject(commit string, file_path string) (Checkout, error) {
@@ -108,8 +139,9 @@ func (c *Client) CreateCheckoutObject(commit string, file_path string) (Checkout
 	root_path := c.Root + "/refs/heads"
 	branches, _ := util.GetBrabches(root_path)
 	for _, branch := range branches {
-		fmt.Println("branch:", branch)
+		fmt.Println("branch_1:", branch)
 		commit_id, _ := c.GetCommitHashFromName(branch)
+		fmt.Println("commit_id:", commit_id)
 		if commit == branch {
 			return Checkout{Hash: commit_id, Path: file_path}, nil
 		}
@@ -121,7 +153,7 @@ func (c *Client) CreateCheckoutObject(commit string, file_path string) (Checkout
 		}
 	}
 
-	return Checkout{}, nil
+	return Checkout{}, errors.New("None")
 }
 
 func (co *Checkout) RollBackIndex(client *Client) {
@@ -129,9 +161,10 @@ func (co *Checkout) RollBackIndex(client *Client) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(string(buffer))
+	// fmt.Println(string(buffer))
 	tree_hash, _ := client.GetCommitTreeHash(buffer)
-	fmt.Println(tree_hash)
+	// fmt.Println(tree_hash)
 	_ = client.GetTreeObject(tree_hash)
-
+	blob_columns := WalkingTree(*client, tree_hash, make([]Column, 0))
+	client.UpdateIndexFromCommit(blob_columns)
 }

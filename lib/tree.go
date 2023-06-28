@@ -140,31 +140,71 @@ func (c *Client) GetTreeObject(hash string) Tree {
 		hash_string = string(hash_buffer[1:])
 	}
 
-
 	buffer, err := c.GetGitObject(hash_string)
 	if err != nil {
 		fmt.Println(err)
 		return Tree{}
 	}
-	fmt.Println("OK", string(buffer))
+	// fmt.Println("OK", string(buffer))
 	entry_buffer := make([][]byte, 0)
 	entry_buf := make([]byte, 0)
 	for _, buf := range buffer {
 		if buf == 0 {
-			entry_buffer = append(entry_buffer, entry_buf)
+			entry_buffer = append(entry_buffer, entry_buf[1:])
 			entry_buf = make([]byte, 0)
 		}
 		entry_buf = append(entry_buf, buf)
 	}
 	entry_buffer = append(entry_buffer, entry_buf)
 
+	var tree Tree
+	tree.Size = 119
 	for _, entry_buf := range entry_buffer[1:] {
-		fmt.Println(string(entry_buf))
-	}
+		var column Column
 
-	return Tree{}
+		// なぜここでもバイト列の先頭が0になるのかがわからない
+		entry_string := string(entry_buf)
+		if entry_buf[0] == 0 {
+			entry_string = string(entry_buf[1:])
+		}
+
+		if strings.HasPrefix(entry_string, "tree") {
+			column.Type = "tree"
+		} else if strings.HasPrefix(entry_string, "blob") {
+			column.Type = "blob"
+		} else {
+			column.Type = "????"
+		}
+		entry_strings := strings.Split(string(entry_buf), " ")
+		column.Name = entry_strings[1]
+		column.Hash = entry_strings[2]
+		tree.Columns = append(tree.Columns, column)
+	}
+	return tree
 }
 
-func WalkingTree(hash string) {
+func WalkingTree(client Client, hash string, blob_columns []Column) []Column {
+
+	tree := client.GetTreeObject(hash)
+
+	for _, column := range tree.Columns {
+		if column.Type == "tree" {
+			blob_columns = append(blob_columns, WalkingTree(client, column.Hash, blob_columns)...)
+		} else {
+			blob_column := Column{Type: column.Type, Name: column.Name, Hash: column.Hash}
+			blob_columns = append(blob_columns, blob_column)
+		}
+	}
+
+	return blob_columns
+}
+
+func (c *Client) UpdateIndexFromCommit(blob_columns []Column) {
+	for _, blob_column := range blob_columns {
+		fmt.Printf("%+v\n", blob_column)
+	}
+}
+
+func (c *Client) UpdateFileFromCommit() {
 
 }

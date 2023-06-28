@@ -50,7 +50,7 @@ func GetBrabches(root string) ([]string, error) {
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		rel_path, err := filepath.Rel(root, path)
 		if rel_path != "." {
-			fmt.Println("rel_path:", rel_path)
+			// fmt.Println("rel_path:", rel_path)
 			branches = append(branches, rel_path)
 		}
 		return nil
